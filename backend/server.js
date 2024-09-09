@@ -1,17 +1,20 @@
 const express = require("express");
 const cors = require("cors");
 const mysql = require("mysql");
+const multer = require('multer');
+const path = require('path');
 const bodyParser = require('body-parser');
 const session = require('express-session');
  
 const { getUserDetails, createUser ,updateUser ,deleteuser,getCategories} = require('./model/user');
 
 const {UsersFetch,UserRegister,UserLogin,UserLogout,UserSession} = require('./model/login');
+const {createCategory,updateCategory,deleteCategory} = require('./model/category');
 
 
 const app = express();
 app.use(express.json());
- 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const db = mysql.createConnection({
     host: "localhost",
@@ -45,6 +48,7 @@ app.use(session({
      }  // Set to true if using HTTPS
 }));
 
+
 //Book Route
 app.get("/", getUserDetails);
 app.post('/create',createUser); 
@@ -58,6 +62,13 @@ app.post('/register',UserRegister);
 app.post('/login',UserLogin);
 app.post('/logout',UserLogout);
 app.get("/check-session", UserSession);
+
+
+//Category Route
+app.post('/category/create',createCategory); 
+app.put('/category/update/:id',updateCategory);
+app.delete('/category/delete/:id',deleteCategory);
+
 
 app.get('/books/:id', (req, res) => {
     const sql = "SELECT * FROM book WHERE ID = ?";

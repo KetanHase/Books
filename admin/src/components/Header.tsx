@@ -98,7 +98,7 @@ const Header: React.FC<AppBarProps & DashboardProps> = ({ open, toggleDrawer, us
         <AppBar position="absolute" color="success" open={open} toggleDrawer={toggleDrawer} >
           <Toolbar
             sx={{
-              pr: '24px', // keep right padding when drawer closed
+              pr: '24px',  
             }}
           >
             <IconButton
@@ -211,6 +211,7 @@ const Header: React.FC<AppBarProps & DashboardProps> = ({ open, toggleDrawer, us
                 </ListItemIcon>
                 Logout
               </MenuItem>
+              
             </Menu>
           </Toolbar>
         </AppBar>

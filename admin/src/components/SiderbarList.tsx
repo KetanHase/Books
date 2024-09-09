@@ -31,11 +31,11 @@ export const SidebarListItems = () => {
 
   return (
     <React.Fragment>
-      <ListItemButton>
+      <ListItemButton component={Link} to="/dashboard">
         <ListItemIcon>
           <DashboardIcon />
         </ListItemIcon>
-        <ListItemText primary="Dashboard" />
+         <ListItemText primary="Dashboard" /> 
       </ListItemButton>
 
       <ListItemButton onClick={handleOrdersClick}>
@@ -79,6 +79,13 @@ export const SidebarListItems = () => {
           </ListItemButton>
         </List>
       </Collapse>
+
+      <ListItemButton component={Link} to="/category">
+        <ListItemIcon>
+          <BarChartIcon />
+        </ListItemIcon>
+        <ListItemText primary="Category" /> 
+      </ListItemButton>
 
       <ListItemButton component={Link} to="/book">
         <ListItemIcon>

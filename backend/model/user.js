@@ -1,4 +1,6 @@
 const mysql = require("mysql");
+const multer = require('multer');
+const path = require('path');
 
 const db = mysql.createConnection({
     host: "localhost",
@@ -6,6 +8,7 @@ const db = mysql.createConnection({
     password: "",
     database: "book_store"
 });
+ 
 
 db.connect(err => {
     if (err) {
@@ -15,7 +18,27 @@ db.connect(err => {
     console.log("Connected to the MySQL database.");
 });
 
- 
+ const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/'); // Folder to store files
+  },
+  /*filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + '-' + file.originalname);
+  }*/
+    filename: function (req, file, cb) {
+        // Get today's date in YYYY-MM-DD format
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Combine today's date with the original file name
+        const fileName = `${today}-${file.originalname}`;
+        
+        // Pass the filename to the callback
+        cb(null, fileName);
+      }
+});
+
+const upload = multer({ storage: storage });
 
 const getUserDetails = (req, res) => {
     const sql = "SELECT * FROM book";
@@ -25,36 +48,64 @@ const getUserDetails = (req, res) => {
     });
 };
 
+const categorizePrice = (price) => {
+    if (price < 100) return 'Low';
+    if (price >= 100 && price <= 200) return 'Medium';
+    return 'High';
+};
+
 const createUser = (req, res) => {
-    const sql = "INSERT INTO book (`name`, `author` ,`price` ,`stock`,`category_id`) VALUES (?)";
+    upload.single('image')(req, res, function (err) {
+        if (err) {
+            return res.status(500).json({ error: "Error uploading image" });
+        }
+    const priceCategory = categorizePrice(req.body.price);
+    const imageFile = req.file ? req.file.filename : null; // Get the uploaded image
+    const sql = "INSERT INTO book (`name`, `author` ,`price` ,`stock`,`category_id`,`price_category`, `imageFile`) VALUES (?)";
     const values = [
         req.body.name,
         req.body.author,
         req.body.price,
         req.body.stock,
-        req.body.category_id
+        req.body.category_id,
+        priceCategory,
+        imageFile
     ];
     db.query(sql, [values], (err, data) => {
         if (err) return res.json("Error");
         return res.json(data);
-    });   
+    }); 
+  });  
 };
 
 const updateUser = (req, res) => {
-    const sql = "update book set `name` = ?, `author` = ?, `price` =?, `stock`= ?, `category_id`=?  WHERE ID = ?";
+    upload.single('image')(req, res, function (err) {
+        if (err) {
+          return res.status(500).json({ error: "Error uploading image" });
+        }
+    const priceCategory = categorizePrice(req.body.price);
+    const imageFile = req.file ? req.file.filename : null; 
+    
+    const sql = "UPDATE book SET `name` = ?, `author` = ?, `price` = ?, `stock` = ?, `category_id` = ?, `price_category` = ?" + (imageFile ? ", `imageFile` = ?" : "") + " WHERE ID = ?";
     const values = [
         req.body.name,
         req.body.author,
         req.body.price,
         req.body.stock,
-        req.body.category_id
+        req.body.category_id,
+        priceCategory
+
          
     ];
+    if (imageFile) values.push(imageFile); // Include image file if uploaded
+    values.push(req.params.id);
+
     const id = req.params.id;
     db.query(sql, [...values, id], (err, data) => {
         if (err) return res.json("Error");
         return res.json(data);
     });
+  });
  };
  
  const deleteuser = (req, res) => {

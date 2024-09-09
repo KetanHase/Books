@@ -15,7 +15,7 @@ import FirstPageIcon from '@mui/icons-material/FirstPage';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
-import { Container, Button, Typography, Modal } from '@mui/material';
+import { Container, Button, Typography, Modal, Select, MenuItem } from '@mui/material';
 import ControlPointOutlinedIcon from '@mui/icons-material/ControlPointOutlined';
 import AddPro from './AddBook';
 import { Book } from '../interfaces/Book';
@@ -95,6 +95,7 @@ const BookList: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [open, setOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Partial<Book> | null>(null);
+  const [filterCategory, setFilterCategory] = useState<string>("");
 
    useEffect(() => {
     axios.get('http://localhost:8081/')
@@ -136,6 +137,12 @@ const handleChangePage = (
     setPage(0);
   };
 
+  const filteredBooks = filterCategory
+    ? books.filter(book => book.price_category === filterCategory)
+    : books;
+  
+    const sortedBooks = [...filteredBooks].sort((a, b) => a.price_category.localeCompare(b.price_category));
+
   return (
     <Container>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
@@ -170,6 +177,22 @@ const handleChangePage = (
         </Modal>
       </Box>
 
+      {/* Filter Dropdown */}
+      <Box mb={2} display="flex" justifyContent="flex-end">
+        <Select
+          value={filterCategory}
+          onChange={(e) => setFilterCategory(e.target.value)}
+          displayEmpty
+          sx={{ width: 200 }}
+        >
+          <MenuItem value="">All Categories</MenuItem>
+          <MenuItem value="Low">Low</MenuItem>
+          <MenuItem value="Medium">Medium</MenuItem>
+          <MenuItem value="High">High</MenuItem>
+        </Select>
+      </Box>
+
+
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
           <TableHead>
@@ -183,8 +206,8 @@ const handleChangePage = (
           </TableHead>
           <TableBody>
             {(rowsPerPage > 0
-              ? books.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              : books
+              ? sortedBooks.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              : sortedBooks
             ).map((book: any) => (
               <TableRow key={book.id}>
                 <TableCell component="th" style={{ width: 160 }} scope="row">

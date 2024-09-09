@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { TextField, Button, Container, Typography, Box, Grid, Card, Checkbox, FormControlLabel, Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import Alert from '@mui/material/Alert';
 
 const Login: React.FC = () => {
     const [username, setUsername] = useState('');
@@ -13,6 +14,11 @@ const Login: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setMessage(null);
+
+        if (username !== 'admin') {
+            setMessage('Access denied. Only admin can log in.');
+            return;
+        }
 
         try {
             const response = await axios.post('http://localhost:8081/login', 

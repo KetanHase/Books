@@ -5,6 +5,8 @@ export interface Book {
     author: string;
     stock: number;
     category_id?: number;
+    price_category: string; 
+    imageFile: string;
   }
   
 
