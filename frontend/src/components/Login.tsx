@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { TextField, Button, Container, Typography, Box, Grid, Card, Checkbox, FormControlLabel, Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import Alert from '@mui/material/Alert';
+ 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -18,10 +18,10 @@ const Login: React.FC = () => {
         e.preventDefault();
         setMessage(null);
 
-        if (username !== 'admin') {
+      {/*  if (username !== 'admin') {
             toast.error('Access denied. Only admin can log in.', { position: "top-right" });
             return;
-        }
+        }*/}
 
         try {
             const response = await axios.post('http://localhost:8081/login', 
@@ -34,7 +34,7 @@ const Login: React.FC = () => {
                 toast.success('Login Successful!', { position: "top-right" });
                 //alert('login Sucessfull');
                 //navigate('/dashboard');
-                window.location.href = '/dashboard';
+                window.location.href = '/';
             } else {
                 //setMessage(response.data.message || 'Login failed. Please check your credentials.');
                 toast.error(response.data.message || 'Login failed. Please check your credentials.', { position: "top-right" });
@@ -103,7 +103,7 @@ const Login: React.FC = () => {
                     </Grid>
                     <Grid item xs={12}>
                         <Typography align="center">
-                            Don't have an account? <Link href="#" variant="body2">Sign up</Link>
+                            Don't have an account? <Link href="/register" variant="body2">Sign up</Link>
                         </Typography>
                     </Grid>
                 </Grid>

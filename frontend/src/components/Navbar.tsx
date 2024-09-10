@@ -13,10 +13,11 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  Badge,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import HeroSection from './HeroSection';
-import Navbar from './Navbar';
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
+ 
  
 
 const LandingPage: React.FC = () => {
@@ -53,7 +54,7 @@ const LandingPage: React.FC = () => {
             <Link href="/" underline="none" color="inherit" sx={{ fontSize: '16px' }}>
               Home
             </Link>
-            <Link href="#" underline="none" color="inherit" sx={{ fontSize: '16px' }}>
+            <Link href="/book" underline="none" color="inherit" sx={{ fontSize: '16px' }}>
               Book
             </Link>
             <Link href="#" underline="none" color="inherit" sx={{ fontSize: '16px' }}>
@@ -84,14 +85,16 @@ const LandingPage: React.FC = () => {
 
           {/* Sign In and Sign Up buttons */}
           <Box sx={{ display: { xs: 'none', sm: 'flex' }, gap: '10px' }}>
-            <Button variant="text" sx={{ color: '#007bff', fontSize: '16px' }}>
-              Sign In
-            </Button>
-            <Button variant="outlined" size="small" sx={{ backgroundColor: '#', color: '#', fontSize: '12px' ,'&:hover': {
+             <IconButton href='/cart'>
+             <Badge badgeContent={2} color="secondary">
+              <ShoppingCartOutlinedIcon />
+              </Badge>
+              </IconButton>
+            <Button variant="outlined" href="/login" size="small" sx={{ backgroundColor: '#', color: '#', fontSize: '12px' ,'&:hover': {
                     backgroundColor: '#0056b3',  
                     color: '#fff'  
                 } }}>
-              Sign Up
+              Sign In
             </Button>
           </Box>
         </Toolbar>
@@ -111,7 +114,7 @@ const LandingPage: React.FC = () => {
               </ListItemButton>
             </ListItem>
             <ListItem disablePadding>
-              <ListItemButton href="/hero">
+              <ListItemButton href="/book">
                 <ListItemText primary="Book" />
               </ListItemButton>
             </ListItem>
@@ -139,8 +142,7 @@ const LandingPage: React.FC = () => {
         </Box>
       </Drawer>
       {/* Hero Section */}
-    <HeroSection />
-    <Navbar />
+    
     </>
   );
 };
