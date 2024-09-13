@@ -19,14 +19,15 @@ interface User {
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);  // Add loading state to wait for session check
+  const [loading, setLoading] = useState(true); // Loading state to wait for session check
 
   const navigate = useNavigate();
 
-  // Check if user is logged in when app loads
+  // Check if the user is logged in when the app loads
   useEffect(() => {
-    axios.get('http://localhost:8081/check-session', { withCredentials: true })
-      .then(response => {
+    axios
+      .get('http://localhost:8081/check-session', { withCredentials: true })
+      .then((response) => {
         setLoggedIn(response.data.loggedIn);
         if (response.data.user) {
           setUser(response.data.user as User);
@@ -37,11 +38,11 @@ function App() {
         setUser(null);
       })
       .finally(() => {
-        setLoading(false);  // Once the session is checked, stop loading
+        setLoading(false); // Once the session is checked, stop loading
       });
   }, []);
 
-  // Function to handle checkout
+  // Function to handle proceeding to checkout
   const handleProceedToCheckout = () => {
     if (!loggedIn) {
       navigate('/login'); // Redirect to login if not logged in
@@ -50,29 +51,28 @@ function App() {
     }
   };
 
+  // If still checking session, render loading state
   if (loading) {
-    return <div>Loading...</div>;  // Render a loading state while checking session
+    return <div>Loading...</div>;
   }
 
   return (
     <Routes>
-      <Route path="/" element={ <LandingPage />} />
-      <Route path="/login" element={loggedIn ? <Navigate to="/orders" /> : <Login />} />
+      {/* Public routes */}
+      <Route path="/" element={<LandingPage    />} />
+      <Route path="/login" element={loggedIn ? <Navigate to="/" /> : <Login  />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/book" element={<Book />} />
+      <Route path="/book" element={ <Book />  } />
       <Route path="/book/:id" element={<Book />} />
-      
-      {/* Pass the userId to the Cart component */}
+
+      {/* Cart route where users can add items to the cart without logging in */}
       <Route
         path="/cart"
-        element={loggedIn && user ? (
-          <Cart userId={user.id} proceedToCheckout={handleProceedToCheckout} />
-        ) : (
-          <Navigate to="/login" />
-        )}
+        element={loggedIn ? <Cart userId={user ? user.id : 0} proceedToCheckout={handleProceedToCheckout} /> : <Navigate to="/login" /> }
       />
 
-      <Route path="/checkout" element={loggedIn ? <Checkout /> : <Navigate to="/login" />} />
+      {/* Checkout and Orders routes require login */}
+      <Route path="/checkout" element={loggedIn ? <Checkout userId={user ? user.id : 0}/> : <Navigate to="/login" />} />
       <Route path="/orders" element={loggedIn ? <Orders user={user} /> : <Navigate to="/login" />} />
     </Routes>
   );

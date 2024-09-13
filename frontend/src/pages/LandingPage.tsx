@@ -34,19 +34,27 @@ const LandingPage: React.FC = () => {
       });
   }, []);
 
+  
+
   // Only proceed if the user is logged in
   if (loading) {
     return <div>Loading...</div>;  // Or any loading spinner
   }
 
-  if (!loggedIn) {
-    return <div>Please log in to access this page.</div>;
-  }
+  //if (!loggedIn) {
+  //  return <div>Please log in to access this page.</div>;
+ // }
 
   // Ensure user data is available before using it
-  const userId = user ? user.id : 1;  // Replace 1 with a fallback if necessary
+  const userId = user ? user.id : 0;  // Replace 1 with a fallback if necessary
+  const username = user ? user.username : 'Guest';
 
   const addToCart = (book: any) => {
+    if (userId === 0) {
+      // Handle the case where the user is not logged in
+      alert("Please log in to add items to your cart.");
+      return; // Stop the function from executing further
+    }
     axios.post('http://localhost:8081/cart/add', {
       userId: userId,  // Pass the actual userId
       bookId: book.id,
@@ -62,7 +70,7 @@ const LandingPage: React.FC = () => {
   return (
     <>
       {/* Navbar */}
-      <Navbar />
+      <Navbar userId={userId} username={username} loggedIn={loggedIn}/>
       {/* Hero Section */}
        <HeroSection />
         {/* Book card Section */}

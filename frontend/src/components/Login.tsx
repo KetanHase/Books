@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
  
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Navbar from './Navbar';
+import Footer from './Footer';
 
 const Login: React.FC = () => {
     const [username, setUsername] = useState('');
@@ -48,6 +50,7 @@ const Login: React.FC = () => {
         <>
             
         <Container maxWidth="xs">
+        
         <Card variant="outlined" sx={{ padding: 4, mt: 8 }}>
             <Box display="flex" justifyContent="center" mb={2}>
                 {/* Sitemark logo here 
@@ -108,9 +111,11 @@ const Login: React.FC = () => {
                     </Grid>
                 </Grid>
             </form>
-        </Card>
+        </Card> 
     </Container>
+    
     <ToastContainer />
+     
     </>
            
     );

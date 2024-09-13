@@ -33,10 +33,11 @@ db.connect(err => {
 });
 
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000','http://localhost:3001'],
     credentials: true
 }));
 
+ 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -45,7 +46,9 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: { secure: false,
-        maxAge: 1000 * 60 * 30   // 1 hour
+      //maxAge: 1000 * 30 // 30 seconds
+    maxAge: 1000 * 60 * 30   // 30 minutes 
+
      }  // Set to true if using HTTPS
 }));
 
@@ -92,7 +95,7 @@ app.post('/cart/add', (req, res) => {
     const userId = req.params.userId;
     
     const query = `
-      SELECT c.user_id, b.id, b.name, b.price, c.quantity
+      SELECT c.user_id, b.id as book_id,c.id as itemId, b.name, b.imageFile, b.price,b.author, c.quantity
       FROM cart c
       JOIN book b ON c.book_id = b.id
       WHERE c.user_id = ?`; 
@@ -142,7 +145,7 @@ app.post('/cart/update', (req, res) => {
     const { bookId, quantity } = req.body;
   
     // Assuming you have a MySQL or similar query setup
-    const sql = 'UPDATE cart SET quantity = ? WHERE book_id = ?';
+    const sql = 'UPDATE cart SET quantity = ? WHERE id = ?';
     db.query(sql, [quantity, bookId], (err, result) => {
       if (err) {
         console.error('Error updating cart item:', err);
@@ -151,6 +154,65 @@ app.post('/cart/update', (req, res) => {
       res.send({ message: 'Quantity updated successfully' });
     });
   });
+
+  app.get('/book/category/:categoryId', (req, res) => {
+    const categoryId = req.params.categoryId;
+    const query = 'SELECT * FROM book WHERE category_id = ?';
+    
+    db.query(query, [categoryId], (err, result) => {
+      if (err) {
+        return res.status(500).send(err);
+      }
+      res.json(result);
+    });
+  });
+
+  // Delete a cart item
+  app.delete('/cart/remove/:itemId', (req, res) => {
+    const sql = "DELETE FROM cart WHERE id = ?";
+    const itemId = req.params.itemId;
+    //console.log('Cart item ID :', itemId); 
+  
+    
+    db.query(sql, [itemId], (err, data) => {
+      if (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({ error: 'Error deleting the item' });
+      }
+      return res.status(200).json({ message: 'Item removed successfully' });
+    });
+  });
+
+ // const { v4: uuidv4 } = require('uuid');
+// Create a new order
+app.post('/orders/create', (req, res) => {
+  console.log('Received order data:', req.body);  // Log the incoming request data
+  const { address, city, postalCode, totalAmount } = req.body;
+
+  const sql = 'INSERT INTO orders (address, city, postal_code, total_amount) VALUES (?, ?, ?, ?)';
+  db.query(sql, [address, city, postalCode, totalAmount], (err, result) => {
+    if (err) {
+      console.error('Error creating order:', err);
+      return res.status(500).send('Error creating order');
+    }
+    res.send({ message: 'Order created successfully' });
+  });
+});
+
+
+// Get orders for a specific user
+app.get('/orders/:userId', (req, res) => {
+  const userId = req.params.userId;
+
+  const sql = 'SELECT * FROM orders WHERE user_id = ? ORDER BY order_date DESC';
+  db.query(sql, [userId], (err, results) => {
+    if (err) {
+      console.error('Error fetching orders:', err);
+      return res.status(500).send('Error fetching orders');
+    }
+    res.send({ orders: results });
+  });
+});
 
 app.get('/books/:id', (req, res) => {
     const sql = "SELECT * FROM book WHERE ID = ?";
