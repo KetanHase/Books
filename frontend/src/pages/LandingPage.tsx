@@ -41,9 +41,7 @@ const LandingPage: React.FC = () => {
     return <div>Loading...</div>;  // Or any loading spinner
   }
 
-  //if (!loggedIn) {
-  //  return <div>Please log in to access this page.</div>;
- // }
+   
 
   // Ensure user data is available before using it
   const userId = user ? user.id : 0;  // Replace 1 with a fallback if necessary
