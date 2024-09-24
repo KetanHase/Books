@@ -60,9 +60,10 @@ function App() {
     <Routes>
       {/* Public routes */}
       <Route path="/" element={<LandingPage    />} />
+      <Route path="/book" element={ <Book />  } />
       <Route path="/login" element={loggedIn ? <Navigate to="/" /> : <Login  />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/book" element={ <Book />  } />
+      
       <Route path="/book/:id" element={<Book />} />
 
       {/* Cart route where users can add items to the cart without logging in */}

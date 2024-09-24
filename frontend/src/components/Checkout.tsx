@@ -9,9 +9,15 @@ import {
   CardContent,
   Grid,
   TextField,
-  Alert
+  Alert,
+  Box,
+  InputAdornment,
+  IconButton
 } from '@mui/material';
 import useCartData from '../api/useCartData';
+import mastercardLogo from '../assets/mastercard.png'; // Ensure you have the images in your project
+import visaLogo from '../assets/visa.png';
+import paypalLogo from '../assets/paypal.png';
 
 const Checkout = ({ userId }: { userId: number }) => {
   const { items, totalAmount, loading } = useCartData(userId);
@@ -21,10 +27,12 @@ const Checkout = ({ userId }: { userId: number }) => {
   const [address, setAddress] = useState<string>('');
   const [cardDetails, setCardDetails] = useState<string>(''); // Optional
    
-const [city, setCity] = useState<string>('');
-const [postalCode, setPostalCode] = useState<string>('');
-const [phone, setPhone] = useState<string>('');
-const [email, setEmail] = useState<string>('');
+  const [city, setCity] = useState<string>('');
+  const [postalCode, setPostalCode] = useState<string>('');
+  const [phone, setPhone] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [expiryDate, setExpiryDate] = useState('');
+  const [cvv, setCvv] = useState('');
 
 
   const handleOrder = async () => {
@@ -74,6 +82,7 @@ const [email, setEmail] = useState<string>('');
               {/* Address Field */}
               <TextField
                 label="Address"
+                size="small"
                 variant="outlined"
                 fullWidth
                 value={address}
@@ -89,6 +98,7 @@ const [email, setEmail] = useState<string>('');
                   <TextField
                     label="City"
                     variant="outlined"
+                    size="small"
                     fullWidth
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
@@ -98,6 +108,7 @@ const [email, setEmail] = useState<string>('');
                 <Grid item xs={6}>
                   <TextField
                     label="Postal Code"
+                    size="small"
                     variant="outlined"
                     fullWidth
                     value={postalCode}
@@ -110,6 +121,7 @@ const [email, setEmail] = useState<string>('');
               {/* Phone Field */}
               <TextField
                 label="Phone"
+                size="small"
                 variant="outlined"
                 fullWidth
                 value={phone}
@@ -120,6 +132,7 @@ const [email, setEmail] = useState<string>('');
               {/* Email Field */}
               <TextField
                 label="Email"
+                size="small"
                 variant="outlined"
                 fullWidth
                 value={email}
@@ -180,29 +193,82 @@ const [email, setEmail] = useState<string>('');
 
             {/* Card 3: Payment Details (Optional) */}
             <Grid item xs={12}>
-              <Card sx={{ marginBottom: '20px' }}>
+              <Card sx={{ marginBottom: '20px', padding: '16px', borderRadius: '12px', boxShadow: '0 6px 18px rgba(0, 0, 0, 0.1)' }}>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
                     Payment Details (Optional)
                   </Typography>
-                  
+
+                  {/* Card Logos */}
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-start', gap: '10px', marginBottom: '20px' }}>
+                    <img src={mastercardLogo} alt="MasterCard" style={{ width: '70px' }} />
+                    <img src={visaLogo} alt="Visa" style={{ width: '70px' }} />
+                    <img src={paypalLogo} alt="PayPal" style={{ width: '70px' }} /> 
+                  </Box>
+
                   {/* Card Details Input */}
                   <TextField
-                    label="Card Details"
+                    label="Card Number"
                     variant="outlined"
+                    size="small"
                     fullWidth
                     value={cardDetails}
                     onChange={(e) => setCardDetails(e.target.value)}
                     placeholder="XXXX-XXXX-XXXX-XXXX"
+                    sx={{ marginBottom: '16px' }}
                   />
+
+                  {/* Expiry and CVV Inputs */}
+                  <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                      <TextField
+                        label="Expiry (MM/YY)"
+                        variant="outlined"
+                        size="small"
+                        fullWidth
+                        value={expiryDate}
+                        onChange={(e) => setExpiryDate(e.target.value)}  
+                        placeholder="MM/YY"
+                        sx={{ marginBottom: '16px' }}
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        label="CVV"
+                        size="small"
+                        variant="outlined"
+                        fullWidth
+                        placeholder="XXX"
+                        value={cvv}
+                        onChange={(e) => setCvv(e.target.value)}
+                        sx={{ marginBottom: '16px' }}
+                      />
+                    </Grid>
+                  </Grid>
+
+                  {/* Placeholder for additional payment information */}
+                  <Typography variant="body2" color="text.secondary">
+                    Your payment details are secure and encrypted.
+                  </Typography>
                 </CardContent>
+                <Grid item>
+            <Button
+              variant="outlined"
+               
+              color="primary"
+              onClick={handleOrder}
+              disabled={isOrdering}
+            >
+              {isOrdering ? <CircularProgress size={24} /> : 'Place Order'}
+            </Button>
+          </Grid>
               </Card>
             </Grid>
-
+            
           </Grid>
         </Grid>
 
-                </Grid>
+     </Grid>
 
         {/* Place Order Button */}
         <Grid 
