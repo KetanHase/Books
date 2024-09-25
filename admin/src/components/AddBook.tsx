@@ -3,6 +3,7 @@ import { Box, Container, Grid, TextField, Button, Typography, Breadcrumbs, Link,
 import axios from 'axios';
 import { Book } from '../interfaces/Book';
 import { Category } from '../interfaces/Category';
+import { Language } from '../interfaces/Language';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import InputAdornment from '@mui/material/InputAdornment'; 
@@ -16,6 +17,7 @@ interface AddProProps {
 const AddPro: React.FC<AddProProps> = ({ book, handleClose }) => {
   const [formData, setFormData] = useState<Partial<Book>>({});
   const [categories, setCategories] = useState<Category[]>([]);
+  const [languages, setLanguages] = useState<Language[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [currentImage, setCurrentImage] = useState<string | null>(null);
 
@@ -49,6 +51,11 @@ const AddPro: React.FC<AddProProps> = ({ book, handleClose }) => {
       .catch(error => console.error("There was an error fetching categories!", error));
   }, []);
 
+  useEffect(() => {
+    axios.get('http://localhost:8081/languages')
+      .then(response => setLanguages(response.data))
+      .catch(error => console.error("There was an error fetching languages!", error));
+  }, []);
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -111,6 +118,12 @@ const AddPro: React.FC<AddProProps> = ({ book, handleClose }) => {
     setFormData({
       ...formData,
       category_id: Number(event.target.value),
+    });
+  };
+  const handleLanguageChange = (event: SelectChangeEvent<number>) => {
+    setFormData({
+      ...formData,
+      language_id: Number(event.target.value),
     });
   };
 
@@ -213,6 +226,25 @@ const AddPro: React.FC<AddProProps> = ({ book, handleClose }) => {
                   {categories.map((category) => (
                     <MenuItem key={category.id} value={category.id}>
                       {category.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth variant="outlined">
+                <InputLabel id="language-label">Language</InputLabel>
+                <Select
+                  labelId="language-label"
+                  id="language"
+                  value={formData.language_id || ''}
+                  onChange={handleLanguageChange}
+                  label="Language"
+                >
+                   
+                  {languages.map((language) => (
+                    <MenuItem key={language.id} value={language.id}>
+                      {language.name}
                     </MenuItem>
                   ))}
                 </Select>

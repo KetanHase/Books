@@ -64,6 +64,7 @@ const LandingPage: React.FC = () => {
     .catch((error) => {
       console.error('Error adding book to cart:', error);
     });
+     
   };
   return (
     <>

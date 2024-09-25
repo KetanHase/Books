@@ -41,9 +41,28 @@ db.connect(err => {
 const upload = multer({ storage: storage });
 
 const getUserDetails = (req, res) => {
-    const sql = "SELECT * FROM book";
+    const sql = `
+        SELECT 
+            book.id, 
+            book.name, 
+            book.price, 
+            book.author, 
+            book.stock, 
+            book.category_id, 
+            book.price_category, 
+            book.status, 
+            book.imageFile,
+            language.name AS language_name
+             
+        FROM book
+        LEFT JOIN language ON book.language_id = language.id
+       ORDER BY book.id DESC
+    `;
     db.query(sql, (err, data) => {
-        if (err) return res.json("Error");
+        if (err) {
+            console.error("Error fetching user details:", err); // Log the full error
+            return res.json({ error: "An error occurred", details: err });
+        }
         return res.json(data);
     });
 };
@@ -54,21 +73,30 @@ const categorizePrice = (price) => {
     return 'High';
 };
 
+const changeStatus = (stock) => {
+    if (stock > 0) return 'Available';
+     return 'Out Of Stock';
+     
+};
+
 const createUser = (req, res) => {
     upload.single('image')(req, res, function (err) {
         if (err) {
             return res.status(500).json({ error: "Error uploading image" });
         }
     const priceCategory = categorizePrice(req.body.price);
+    const bookstatus = changeStatus(req.body.stock);
     const imageFile = req.file ? req.file.filename : null; // Get the uploaded image
-    const sql = "INSERT INTO book (`name`, `author` ,`price` ,`stock`,`category_id`,`price_category`, `imageFile`) VALUES (?)";
+    const sql = "INSERT INTO book (`name`, `author` ,`price` ,`stock`,`category_id`,`language_id`,`price_category`,`status`, `imageFile`) VALUES (?)";
     const values = [
         req.body.name,
         req.body.author,
         req.body.price,
         req.body.stock,
         req.body.category_id,
+        req.body.language_id,
         priceCategory,
+        bookstatus,
         imageFile
     ];
     db.query(sql, [values], (err, data) => {
@@ -86,13 +114,14 @@ const updateUser = (req, res) => {
     const priceCategory = categorizePrice(req.body.price);
     const imageFile = req.file ? req.file.filename : null; 
     
-    const sql = "UPDATE book SET `name` = ?, `author` = ?, `price` = ?, `stock` = ?, `category_id` = ?, `price_category` = ?" + (imageFile ? ", `imageFile` = ?" : "") + " WHERE ID = ?";
+    const sql = "UPDATE book SET `name` = ?, `author` = ?, `price` = ?, `stock` = ?, `category_id` = ?,  `language_id` = ?,`price_category` = ?" + (imageFile ? ", `imageFile` = ?" : "") + " WHERE ID = ?";
     const values = [
         req.body.name,
         req.body.author,
         req.body.price,
         req.body.stock,
         req.body.category_id,
+        req.body.language_id,
         priceCategory
 
          
@@ -126,5 +155,14 @@ const updateUser = (req, res) => {
     });
 };
 
+const getLanguages = (req, res) => {
+    const sql = "SELECT * FROM language";
+    db.query(sql, (err, data) => {
+        if (err) return res.status(500).json({ message: "Error fetching categories." });
+        return res.status(200).json(data);
+    });
+};
 
-module.exports = { getUserDetails ,createUser, updateUser, deleteuser,getCategories};
+
+
+module.exports = { getUserDetails ,createUser, updateUser, deleteuser,getCategories,getLanguages};

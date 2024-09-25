@@ -6,10 +6,11 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const session = require('express-session');
  
-const { getUserDetails, createUser ,updateUser ,deleteuser,getCategories} = require('./model/user');
+const { getUserDetails, createUser ,updateUser ,deleteuser,getCategories,getLanguages} = require('./model/user');
 
 const {UsersFetch,UserRegister,UserLogin,UserLogout,UserSession} = require('./model/login');
 const {createCategory,updateCategory,deleteCategory} = require('./model/category');
+const {createLanguage,updateLanguage,deleteLanguage} = require('./model/language');
 const cartRoutes = require('./model/cart');
 
 
@@ -59,6 +60,7 @@ app.post('/create',createUser);
 app.put('/update/:id',updateUser);
 app.delete('/delete/:id',deleteuser);
 app.get('/categories', getCategories);
+app.get('/languages', getLanguages);
 
 //Login Route
 app.get("/user", UsersFetch); 
@@ -72,6 +74,11 @@ app.get("/check-session", UserSession);
 app.post('/category/create',createCategory); 
 app.put('/category/update/:id',updateCategory);
 app.delete('/category/delete/:id',deleteCategory);
+
+//Language Route
+app.post('/language/create',createLanguage); 
+app.put('/language/update/:id',updateLanguage);
+app.delete('/language/delete/:id',deleteLanguage);
 
 app.post('/cart/add', (req, res) => {
     const { userId, bookId, quantity } = req.body;
@@ -185,12 +192,13 @@ app.post('/cart/update', (req, res) => {
 
  // const { v4: uuidv4 } = require('uuid');
 // Create a new order
-app.post('/orders/create', (req, res) => {
-  console.log('Received order data:', req.body);  // Log the incoming request data
-  const { address, city, postalCode, totalAmount } = req.body;
+app.post('/orders/create/', (req, res) => {
+  //const userId = req.params.userId;
+  //console.log('Received order data:', req.body);  // Log the incoming request data
+  const { userId,address, city, postalCode,phone,email,card_number,expiry,cvv,items , totalAmount} = req.body;
 
-  const sql = 'INSERT INTO orders (address, city, postal_code, total_amount) VALUES (?, ?, ?, ?)';
-  db.query(sql, [address, city, postalCode, totalAmount], (err, result) => {
+  const sql = 'INSERT INTO orders (user_id, address, city, postalCode,phone,email,card_number,expiry,cvv, totalAmount) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+  db.query(sql, [userId,address, city, postalCode,phone,email,card_number,expiry,cvv,    totalAmount],   (err, result) => {
     if (err) {
       console.error('Error creating order:', err);
       return res.status(500).send('Error creating order');
@@ -204,15 +212,33 @@ app.post('/orders/create', (req, res) => {
 app.get('/orders/:userId', (req, res) => {
   const userId = req.params.userId;
 
-  const sql = 'SELECT * FROM orders WHERE user_id = ? ORDER BY order_date DESC';
-  db.query(sql, [userId], (err, results) => {
+  const sql = 'SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC';
+  db.query(sql, [userId], (err, orders) => {
+    if (err) {
+      console.error('Error fetching orders:', err);
+      return res.status(500).json({ message: 'Error fetching orders' });
+    }
+
+    if (orders.length === 0) {
+      return res.status(404).json({ message: 'No orders found for this user.' });
+    }
+
+    res.json(orders);
+  });
+});
+
+//Get orders for admin
+app.get('/admin/orders', (req, res) => {
+  const sql = 'SELECT * FROM orders'; // Adjust the SQL if you need specific fields
+  db.query(sql, (err, results) => {
     if (err) {
       console.error('Error fetching orders:', err);
       return res.status(500).send('Error fetching orders');
     }
-    res.send({ orders: results });
+    res.json(results); // Send the retrieved orders as JSON
   });
 });
+
 
 app.get('/books/:id', (req, res) => {
     const sql = "SELECT * FROM book WHERE ID = ?";

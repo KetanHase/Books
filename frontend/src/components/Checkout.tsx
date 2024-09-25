@@ -18,6 +18,7 @@ import useCartData from '../api/useCartData';
 import mastercardLogo from '../assets/mastercard.png'; // Ensure you have the images in your project
 import visaLogo from '../assets/visa.png';
 import paypalLogo from '../assets/paypal.png';
+import { Navigate } from 'react-router-dom';
 
 const Checkout = ({ userId }: { userId: number }) => {
   const { items, totalAmount, loading } = useCartData(userId);
@@ -40,18 +41,39 @@ const Checkout = ({ userId }: { userId: number }) => {
     setOrderStatus(null);
 
     try {
-      //await axios.post(`http://localhost:8081/orders/create/${userId}`);
+      const orderData = {
+        userId, 
+        address,
+        city,
+        postalCode,
+        phone,
+        email,
+        card_number: cardDetails,
+        expiry: expiryDate,
+        cvv,
+        totalAmount,
+        items: items.map((item) => ({
+          name: item.name
+        })),
+      };
+
+      await axios.post(`http://localhost:8081/orders/create`, orderData);
+      console.log('Order placed');
+
+
       await axios.post(`http://localhost:8081/cart/clear/${userId}`);
-      
+    
       setOrderStatus('Order placed and cart cleared successfully.');
       setOpenSnackbar(true);
+      window.location.href = '/orders'; // or '/order' depending on your route
+      //window.location.reload();
     } catch (error) {
       console.error('Error placing order or clearing cart:', error);
       setOrderStatus('Error placing order or clearing cart.');
       setOpenSnackbar(true);
     } finally {
       setIsOrdering(false);
-    }
+    }   
   };
 
   return (

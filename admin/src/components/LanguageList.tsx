@@ -15,12 +15,13 @@ import FirstPageIcon from '@mui/icons-material/FirstPage';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
-import { Container, Button, Typography, Modal, Select, MenuItem } from '@mui/material';
+import { Container, Button, Typography, Modal } from '@mui/material';
 import ControlPointOutlinedIcon from '@mui/icons-material/ControlPointOutlined';
-import AddPro from './AddBook';
-import { Book } from '../interfaces/Book';
+ 
+import { Language } from '../interfaces/Language';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import AddLanguage from './AddLanguage';
 
 interface TablePaginationActionsProps {
   count: number;
@@ -88,26 +89,24 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
   );
 }
 
-const BookList: React.FC = () => {
-  const [books, setBooks] = useState<Book[]>([]);
+const LanguageList: React.FC = () => {
+  const [languages, setLanguages] = useState<Language[]>([]);
 
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [open, setOpen] = useState(false);
-  const [selectedBook, setSelectedBook] = useState<Partial<Book> | null>(null);
-  const [filterCategory, setFilterCategory] = useState<string>("");
-  
+  const [selectedLanguages, setSelectedLanguages] = useState<Partial<Language> | null>(null);
 
    useEffect(() => {
-    axios.get('http://localhost:8081/')
-      .then(response => setBooks(response.data))
-      .catch(error => console.error("There was an error fetching the books!", error));
+    axios.get('http://localhost:8081/languages')
+      .then(response => setLanguages(response.data))
+      .catch(error => console.error("There was an error fetching the Languages!", error));
   }, []);
 
-const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - books.length) : 0;
+const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - languages.length) : 0;
 
-const handleOpen = (book?: Partial<Book>) => {
-  setSelectedBook(book || null);
+const handleOpen = (language?: Partial<Language>) => {
+    setSelectedLanguages(language || null);
   setOpen(true);
 };
 
@@ -115,10 +114,10 @@ const handleClose = () => setOpen(false);
 
 const handleDelete = async (id: number) => {
   try {
-    await axios.delete(`http://localhost:8081/delete/${id}`);
+    await axios.delete(`http://localhost:8081/language/delete/${id}`);
     window.location.reload();  
   } catch (err) {
-    console.error('Error deleting the book:', err);
+    console.error('Error deleting the Language:', err);
   }
 };
 
@@ -138,19 +137,13 @@ const handleChangePage = (
     setPage(0);
   };
 
-  const filteredBooks = filterCategory
-    ? books.filter(book => book.price_category === filterCategory)
-    : books;
-  
-    const sortedBooks = [...filteredBooks].sort((a, b) => a.price_category.localeCompare(b.price_category));
-
   return (
     <Container>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h5">Manage Book</Typography>
+        <Typography variant="h5">Manage Language</Typography>
         <Button variant="contained" size="small" color="primary" onClick={() => handleOpen()}>
           <ControlPointOutlinedIcon fontSize='small' sx={{ mr: 1 }} />
-          Book
+          Language
         </Button>
         <Modal
           open={open}
@@ -173,102 +166,45 @@ const handleChangePage = (
               width: 800,
             }}
           >
-            <AddPro book={selectedBook} handleClose={handleClose}  />
+            <AddLanguage language={selectedLanguages} handleClose={handleClose}  />
           </Box>
         </Modal>
       </Box>
-
-      {/* Filter Dropdown */}
-      <Box mb={2} mr={2} display="flex" justifyContent="flex-end">
-        <Select
-           size="small" 
-          value={filterCategory}
-          onChange={(e) => setFilterCategory(e.target.value)}
-          displayEmpty
-          sx={{ width: 150 , mr:2}}
-        >
-          <MenuItem value="">Sort By Price</MenuItem>
-          <MenuItem value="Low">Low</MenuItem>
-          <MenuItem value="Medium">Medium</MenuItem>
-          <MenuItem value="High">High</MenuItem>
-        </Select>
-
-        <Select
-            size="small" 
-            displayEmpty
-            sx={{ width: 150}}
-          >
-            
-            <MenuItem >Religion</MenuItem>
-            <MenuItem >Novel</MenuItem>
-            <MenuItem >History</MenuItem>
-            <MenuItem >Filter By Category</MenuItem>
-            
-            
-              
-        </Select>
-      </Box>
-
 
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
           <TableHead>
             <TableRow>
               <TableCell>Name</TableCell>
-              <TableCell>Price</TableCell>
-              <TableCell>Author</TableCell>
-              <TableCell>Stock</TableCell>
-              <TableCell>Language</TableCell>
-              <TableCell>Status</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {(rowsPerPage > 0
-              ? sortedBooks.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              : sortedBooks
-            ).map((book: any) => (
-              <TableRow key={book.id}>
-                <TableCell component="th" style={{ width: 160 }} scope="row">
-                {book.name} 
+              ? languages.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              : languages
+            ).map((language: any) => (
+              <TableRow key={language.id}>
+                <TableCell component="th" style={{ width: 250 }} scope="row">
+                {language.name} 
                 </TableCell>
-                <TableCell style={{ width: 100 }}>
-                {book.price}
-                  </TableCell>
-                <TableCell style={{ width: 100 }}>
-                {book.author}
-                  </TableCell>
-                <TableCell style={{ width: 100 }}>
-                {book.stock}
-                  </TableCell>
-                  <TableCell style={{ width: 100 }}>
-                {book.language_name}
-                  </TableCell>
-                  <TableCell style={{ width: 100,color: book.status === 'Available' ? 'green' : 'red' }}>
-                  {book.status}
-                  </TableCell>
-                <TableCell  >
-                <Button variant="outlined" size="small" color="secondary"   onClick={() => handleOpen(book)}
+                 
+                <TableCell style={{ width: 250 }} >
+                <Button variant="outlined" size="small" color="secondary"   onClick={() => handleOpen(language)}
                   sx={{mr:2}}>
                     Update
                   </Button>
                   <Button
                     variant="outlined" color="error" size="small" 
-                    onClick={() => handleDelete(book.id)} sx={{mr:2}}
+                    onClick={() => handleDelete(language.id)}
                   >
                     Delete
-                  </Button>
-                  <Button
-                    variant="outlined" color="success" size="small" 
-                    onClick={() => handleDelete(book.id)}
-                  >
-                    View
                   </Button>
                 </TableCell>
               </TableRow>
             ))}
             {open && (
-                <AddPro book={selectedBook} handleClose={handleClose} />
+                <AddLanguage language={selectedLanguages} handleClose={handleClose} />
                )}
             {emptyRows > 0 && (
               <TableRow style={{ height: 53 * emptyRows }}>
@@ -279,9 +215,9 @@ const handleChangePage = (
           <TableFooter>
             <TableRow>
               <TablePagination
-                rowsPerPageOptions={[10, 25,50,100, { label: 'All', value: -1 }]}
+                rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
                 colSpan={6}
-                count={books.length}
+                count={languages.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onPageChange={handleChangePage}
@@ -297,4 +233,4 @@ const handleChangePage = (
 }
 
 
-export default BookList;
+export default LanguageList;

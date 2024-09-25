@@ -12,6 +12,7 @@ import Book from './pages/Book';
 import Register from './pages/Registeruser';
 import  Login  from './pages/LoginPage';
 import  Category  from './pages/Category';
+import Language from './pages/Language';
 
 
 interface User {
@@ -49,7 +50,7 @@ const App: React.FC = () => {
 
                 <Route path="/book" element={<Book /> } />
                 <Route path="/category" element={<Category /> } />
-                 
+                <Route path="/language" element={<Language /> } />
                  
             </Routes>
         </Router>

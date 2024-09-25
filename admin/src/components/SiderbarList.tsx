@@ -93,6 +93,14 @@ export const SidebarListItems = () => {
         </ListItemIcon>
         <ListItemText primary="Book" /> 
       </ListItemButton>
+
+      <ListItemButton component={Link} to="/language">
+        <ListItemIcon>
+          <BarChartIcon />
+        </ListItemIcon>
+        <ListItemText primary="Language" /> 
+      </ListItemButton>
+
       <ListItemButton>
         <ListItemIcon>
           <LayersIcon />

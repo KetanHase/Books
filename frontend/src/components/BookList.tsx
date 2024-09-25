@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
- 
-import { Card, CardContent,SelectChangeEvent , CardActions, Button, Typography, Container, Grid, Box, Snackbar, Alert, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { Card, CardContent, SelectChangeEvent, CardActions, Button, Typography, Container, Grid, Box, Snackbar, Alert, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import axios from 'axios';
 
 interface BookListProps {
   userId: number;
   addToCart: (book: Book) => void;
 }
+
 interface Book {
   id: number;
   name: string;
@@ -14,38 +14,38 @@ interface Book {
   author: string;
   stock: number;
   imageFile: string;
+  price_category: string;  
+  category_id: number;
+  language: string;
 }
+
 interface Category {
   id: number;
   name: string;
 }
-
+const languages = ['English', 'Spanish', 'French', 'German']; // Example languages
 const BookList: React.FC<BookListProps> = ({ userId }) => {
   const [books, setBooks] = useState<Book[]>([]);
-  const [snackbarOpen, setSnackbarOpen] = useState(false); // Snackbar state
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | string>('all');
-
- {/*  useEffect(() => {
-    axios.get('http://localhost:8081/')
-      .then(response => setBooks(response.data))
-      .catch(error => console.error("There was an error fetching the books!", error));
-  }, []);*/}
+  const [filterCategory, setFilterCategory] = useState<string>("");
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("");
 
   useEffect(() => {
-    // Fetch all categories on component mount
     axios.get('http://localhost:8081/categories')
       .then(response => setCategories(response.data))
       .catch(error => console.error("Error fetching categories", error));
-
-    // Initially fetch all books
     fetchBooks();
   }, []);
 
-  const fetchBooks = (categoryId: number | string = 'all') => {
+  const fetchBooks = (categoryId: number | string = 'all',language: string = '') => {
     let url = 'http://localhost:8081/';
     if (categoryId !== 'all') {
       url = `http://localhost:8081/book/category/${categoryId}`;
+    }
+    if (language) {
+      url += `?language=${language}`; // Assuming you have a query parameter for language
     }
     axios.get(url)
       .then(response => setBooks(response.data))
@@ -55,7 +55,7 @@ const BookList: React.FC<BookListProps> = ({ userId }) => {
   const handleCategoryChange = (event: SelectChangeEvent<number | string>) => {
     const categoryId = event.target.value as number | string;
     setSelectedCategory(categoryId);
-    fetchBooks(categoryId);  // Fetch books for the selected category
+    fetchBooks(categoryId);
   };
 
   const addToCart = (book: Book) => {
@@ -64,57 +64,118 @@ const BookList: React.FC<BookListProps> = ({ userId }) => {
       return;
     }
     axios.post('http://localhost:8081/cart/add', {
-      userId: userId, // Replace with logged-in user's ID
+      userId: userId,
       bookId: book.id,
       quantity: 1,
     })
-    .then(() => {
-      setSnackbarOpen(true);
-      console.log('Book added to cart');
-    })
-    .catch(error => {
-      console.error('Error adding book to cart:', error);
-    });
+      .then(() => {
+        setSnackbarOpen(true);
+        console.log('Book added to cart');
+      })
+      .catch(error => {
+        console.error('Error adding book to cart:', error);
+      });
   };
-  
+
   const handleSnackbarClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
       return;
     }
-    setSnackbarOpen(false); // Close snackbar
+    setSnackbarOpen(false);
   };
 
+  const handleLanguageChange = (event: SelectChangeEvent<string>) => {
+    const language = event.target.value;
+    setSelectedLanguage(language);
+    fetchBooks(selectedCategory, language);
+  };
 
+  const filteredBooks = books.filter(book => {
+    const categoryMatch = selectedCategory === 'all' || book.category_id === selectedCategory;
+    const priceMatch = filterCategory ? book.price_category === filterCategory : true;
+    const languageMatch = selectedLanguage ? book.language === selectedLanguage : true;
+    return categoryMatch && priceMatch && languageMatch;
+  });
+  const formControlStyles = {
+    mt: { xs: 2, sm: 3 },
+    mb: { xs: 3, sm: 5 },
+    mr: { xs: 3, sm: 5 },
+    width: { xs: '100%', sm: '60%', md: '25%' },
+    mx: 'auto',
+     
+  };
+  
   return (
-    <Box>
-      <Typography variant="h4" sx={{ mt:2 }}>Books</Typography>
+    <Box sx={{ mt: 5, mb: 5, px: { xs: 2, sm: 4, md: 6 } }}>
+      <Typography variant="h4" sx={{ mt: 2, mb: 3, textAlign: 'center' }}>
+        Books
+      </Typography>
+
       
-      <FormControl fullWidth sx={{ mt: 3, mb: 3 }}>
-        <InputLabel>Category</InputLabel>
-        <Select value={selectedCategory} onChange={handleCategoryChange}>
-          <MenuItem value="all">All Categories</MenuItem>
-          {categories.map(category => (
-            <MenuItem key={category.id} value={category.id}>
-              {category.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+<FormControl size="small" sx={formControlStyles}>
+  <Typography variant='h6'>Select Category</Typography>
+  <Select value={selectedCategory} onChange={handleCategoryChange}>
+    <MenuItem value="all">All Categories</MenuItem>
+    {categories.map((category) => (
+      <MenuItem key={category.id} value={category.id}>
+        {category.name}
+      </MenuItem>
+    ))}
+  </Select>
+</FormControl>
 
+<FormControl size="small" sx={formControlStyles}>
+  <Typography variant='h6'>Sort By Price</Typography>
+  <Select
+    value={filterCategory}
+    onChange={(e) => setFilterCategory(e.target.value)}
+    displayEmpty
+  >
+    <MenuItem value="">All Prices</MenuItem>
+    <MenuItem value="Low">Low</MenuItem>
+    <MenuItem value="Medium">Medium</MenuItem>
+    <MenuItem value="High">High</MenuItem>
+  </Select>
+</FormControl>
 
-      <Container sx={{ mt:3 }}>
-        <Grid container spacing={3} justifyContent="center">
-          {books.map((book) => (
+<FormControl size="small" sx={formControlStyles}>
+  <Typography variant='h6'>Select Language</Typography>
+  <Select value={selectedLanguage} onChange={handleLanguageChange}>
+    <MenuItem value="">All Languages</MenuItem>
+    {languages.map((language, index) => (
+      <MenuItem key={index} value={language}>
+        {language}
+      </MenuItem>
+    ))}
+  </Select>
+</FormControl>
+
+      <Container maxWidth="lg" sx={{ mt: 4 }}>
+        <Grid container spacing={4} justifyContent="center">
+          {filteredBooks.map((book) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={book.id}>
-              <Card sx={{ mb: 5, display: 'flex', flexDirection: 'column', height: '100%' }}>
-              <img
-                  src={`http://localhost:8081/uploads/${book.imageFile}`} // Display the image
+              <Card
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  height: '100%',
+                  borderRadius: 2,
+                  boxShadow: 3,
+                  transition: 'transform 0.1s ease-in-out',
+                  '&:hover': {
+                    transform: 'scale(1.05)',
+                  },
+                }}
+              >
+                <img
+                  src={`http://localhost:8081/uploads/${book.imageFile}`}
                   alt={book.name}
                   style={{
                     width: '100%',
-                    height: '200px', // Set a fixed height or use `auto` to maintain aspect ratio
-                    objectFit: 'fill', // Adjust to 'contain' or 'fill' if needed
-                    borderRadius: '4px' // Optional: Adds rounded corners
+                    height: '200px',
+                    objectFit: 'cover',
+                    borderTopLeftRadius: '4px',
+                    borderTopRightRadius: '4px',
                   }}
                 />
                 <CardContent sx={{ flexGrow: 1 }}>
@@ -122,15 +183,18 @@ const BookList: React.FC<BookListProps> = ({ userId }) => {
                     {book.name}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Price: Rs{book.price}
+                    Price: Rs {book.price}
                   </Typography>
                   <Typography variant="h6" component="div" gutterBottom>
                     {book.author}
                   </Typography>
                 </CardContent>
                 <CardActions>
-                  <Button size="small" variant="contained" color="warning" onClick={() => addToCart(book)}>
+                  <Button size="small" variant="contained" color="warning" sx={{mr: 2}} onClick={() => addToCart(book)}  >
                     Add to cart
+                  </Button>
+                  <Button size="small" variant="contained" color="info"  onClick={() => addToCart(book)}  >
+                       Quick View
                   </Button>
                 </CardActions>
               </Card>
@@ -141,15 +205,14 @@ const BookList: React.FC<BookListProps> = ({ userId }) => {
 
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={3000} // Automatically hide after 3 seconds
+        autoHideDuration={3000}
         onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }} // Position at top-right
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
         <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
           Item added to cart successfully!
         </Alert>
       </Snackbar>
-
     </Box>
   );
 };
