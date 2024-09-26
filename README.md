@@ -1,6 +1,8 @@
 # Book
 Book Store
-
+ 1-npm install for admin backend frontend 
+ Run Project "npm start"
+  
 
 //BookList page after login at add to cart
 
