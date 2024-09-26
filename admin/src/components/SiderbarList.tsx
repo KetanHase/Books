@@ -38,47 +38,22 @@ export const SidebarListItems = () => {
          <ListItemText primary="Dashboard" /> 
       </ListItemButton>
 
-      <ListItemButton onClick={handleOrdersClick}>
+      <ListItemButton component={Link} to="/order">
         <ListItemIcon>
           <ShoppingCartIcon />
         </ListItemIcon>
         <ListItemText primary="Orders" />
-        {openOrders ? <ExpandLess /> : <ExpandMore />}
+        
       </ListItemButton>
-      <Collapse in={openOrders} timeout="auto" unmountOnExit>
-        <List component="div" disablePadding>
-          <ListItemButton sx={{ pl: 4 }}>
-          <ListItemIcon>
-             <AddIcon />
-          </ListItemIcon>
-            <ListItemText primary="Add" />
-          </ListItemButton>
-          <ListItemButton sx={{ pl: 4 }}>
-          <ListItemIcon>
-             <ListOutlinedIcon />
-          </ListItemIcon>
-            <ListItemText primary="List" />
-          </ListItemButton>
-        </List>
-      </Collapse>
+       
 
-      <ListItemButton onClick={handleCustomersClick}>
+      <ListItemButton component={Link} to="/customer" >
         <ListItemIcon>
           <PeopleIcon />
         </ListItemIcon>
         <ListItemText primary="Customers" />
-        {openCustomers ? <ExpandLess /> : <ExpandMore />}
       </ListItemButton>
-      <Collapse in={openCustomers} timeout="auto" unmountOnExit>
-        <List component="div" disablePadding>
-          <ListItemButton sx={{ pl: 4 }}>
-            <ListItemText primary="New Customers" />
-          </ListItemButton>
-          <ListItemButton sx={{ pl: 4 }}>
-            <ListItemText primary="Returning Customers" />
-          </ListItemButton>
-        </List>
-      </Collapse>
+     
 
       <ListItemButton component={Link} to="/category">
         <ListItemIcon>

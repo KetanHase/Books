@@ -30,7 +30,7 @@ interface user {
 
 const defaultTheme = createTheme();
 
-export default function Order() {
+export default function Customer() {
   const [open, setOpen] = React.useState(true);
   const [user, setUser] = React.useState<user | null>(null);
   const isMobile = useMediaQuery('(max-width: 768px)');

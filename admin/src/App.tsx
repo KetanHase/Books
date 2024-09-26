@@ -13,6 +13,8 @@ import Register from './pages/Registeruser';
 import  Login  from './pages/LoginPage';
 import  Category  from './pages/Category';
 import Language from './pages/Language';
+import Order from './pages/Order';
+import Customer from './pages/Customer';
 
 
 interface User {
@@ -51,6 +53,8 @@ const App: React.FC = () => {
                 <Route path="/book" element={<Book /> } />
                 <Route path="/category" element={<Category /> } />
                 <Route path="/language" element={<Language /> } />
+                <Route path="/order" element={<Order /> } />
+                <Route path="/customer" element={<Customer /> } />
                  
             </Routes>
         </Router>

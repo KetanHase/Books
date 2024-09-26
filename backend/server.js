@@ -192,41 +192,125 @@ app.post('/cart/update', (req, res) => {
 
  // const { v4: uuidv4 } = require('uuid');
 // Create a new order
-app.post('/orders/create/', (req, res) => {
-  //const userId = req.params.userId;
-  //console.log('Received order data:', req.body);  // Log the incoming request data
-  const { userId,address, city, postalCode,phone,email,card_number,expiry,cvv,items , totalAmount} = req.body;
+app.post('/orders/create', (req, res) => {
+  const { userId, address, city, postalCode, phone, email, card_number, expiry, cvv, totalAmount, items } = req.body;
 
-  const sql = 'INSERT INTO orders (user_id, address, city, postalCode,phone,email,card_number,expiry,cvv, totalAmount) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-  db.query(sql, [userId,address, city, postalCode,phone,email,card_number,expiry,cvv,    totalAmount],   (err, result) => {
+  const sqlOrder = 'INSERT INTO orders (user_id, address, city, postalCode, phone, email, card_number, expiry, cvv, status, totalAmount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+  db.query(sqlOrder, [userId, address, city, postalCode, phone, email, card_number, expiry, cvv,'completed', totalAmount], (err, result) => {
     if (err) {
       console.error('Error creating order:', err);
       return res.status(500).send('Error creating order');
     }
-    res.send({ message: 'Order created successfully' });
+
+    // Get the newly created order ID
+    const orderId = result.insertId;
+
+    // Insert each item into the order_items table
+    const sqlItem = 'INSERT INTO order_items (order_id, item_name, item_quantity) VALUES (?, ?, ?)';
+    const itemPromises = items.map(item => {
+      return new Promise((resolve, reject) => {
+        db.query(sqlItem, [orderId, item.name,item.quantity], (err) => {
+          if (err) {
+            console.error('Error inserting order item:', err);
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      });
+    });
+
+    // Wait for all item inserts to complete
+    Promise.all(itemPromises)
+      .then(() => {
+        res.send({ message: 'Order created successfully with items' });
+      })
+      .catch((err) => {
+        console.error('Error inserting order items:', err);
+        res.status(500).send('Error inserting order items');
+      });
   });
 });
+
 
 
 // Get orders for a specific user
 app.get('/orders/:userId', (req, res) => {
   const userId = req.params.userId;
 
-  const sql = 'SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC';
-  db.query(sql, [userId], (err, orders) => {
+  const sql = `
+    SELECT 
+      o.id AS order_id,
+      o.user_id,
+      o.address,
+      o.city,
+      o.postalCode,
+      o.phone,
+      o.email,
+      o.card_number,
+      o.expiry,
+      o.cvv,
+      o.status,
+      o.totalAmount,
+      o.created_at,
+      oi.item_name,
+      oi.item_quantity
+
+    FROM 
+      orders o
+    LEFT JOIN 
+      order_items oi ON o.id = oi.order_id
+    WHERE 
+      o.user_id = ?
+    ORDER BY 
+      o.id DESC
+  `;
+
+  db.query(sql, [userId], (err, results) => {
     if (err) {
       console.error('Error fetching orders:', err);
       return res.status(500).json({ message: 'Error fetching orders' });
     }
 
-    if (orders.length === 0) {
+    if (results.length === 0) {
       return res.status(404).json({ message: 'No orders found for this user.' });
     }
 
-    res.json(orders);
+    // Group orders by order_id
+    const orders = results.reduce((acc, row) => {
+      const { order_id, user_id, address, city, postalCode, phone, email, card_number, expiry, cvv, totalAmount,created_at,item_name, item_quantity,status  } = row;
+
+      if (!acc[order_id]) {
+        acc[order_id] = {
+          order_id,
+          user_id,
+          address,
+          city,
+          postalCode,
+          phone,
+          email,
+          card_number,
+          expiry,
+          cvv,
+          totalAmount,
+          created_at,
+          status,
+          items: []
+        };
+      }
+
+      if (item_name) {
+        acc[order_id].items.push({ name: item_name, quantity: item_quantity });
+      }
+
+      return acc;
+    }, {});
+
+    res.json(Object.values(orders));
   });
 });
 
+{/* 
 //Get orders for admin
 app.get('/admin/orders', (req, res) => {
   const sql = 'SELECT * FROM orders'; // Adjust the SQL if you need specific fields
@@ -236,6 +320,60 @@ app.get('/admin/orders', (req, res) => {
       return res.status(500).send('Error fetching orders');
     }
     res.json(results); // Send the retrieved orders as JSON
+  });
+});
+*/}
+
+
+// Assuming orders and order_items are the tables
+app.get('/admin/orders', (req, res) => {
+  const sql = `
+    SELECT o.id AS order_id, o.address, o.city, o.postalCode, o.totalAmount, o.created_at, oi.item_name , oi.item_quantity, o.status
+    FROM orders o
+    JOIN order_items oi ON o.id = oi.order_id
+  `;
+  
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error fetching orders:', err);
+      return res.status(500).send('Error fetching orders');
+    }
+    
+    // You might need to format the results so that items are grouped under the respective order
+    const ordersMap = results.reduce((acc, row) => {
+      const order = acc[row.order_id] || {
+        order_id: row.order_id,
+        address: row.address,
+        city: row.city,
+        postalCode: row.postalCode,
+        totalAmount: row.totalAmount,
+        created_at: row.created_at,
+        status: row.status,
+        items: [],
+      };
+      order.items.push({ name: row.item_name, quantity: row.item_quantity });
+      acc[row.order_id] = order;
+      return acc;
+    }, {});
+
+    const orders = Object.values(ordersMap);
+    res.json(orders);
+  });
+});
+
+//update order status
+app.put('/admin/orders/:id', (req, res) => {
+  const orderId = req.params.id;
+  const { status } = req.body;
+
+  const sql = 'UPDATE orders SET status = ? WHERE id = ?';
+  db.query(sql, [status, orderId], (err, result) => {
+    if (err) {
+      console.error('Error updating order status:', err);
+      return res.status(500).send('Error updating order status');
+    }
+
+    res.send('Order status updated successfully');
   });
 });
 

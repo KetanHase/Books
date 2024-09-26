@@ -52,9 +52,10 @@ const Checkout = ({ userId }: { userId: number }) => {
         expiry: expiryDate,
         cvv,
         totalAmount,
-        items: items.map((item) => ({
-          name: item.name
-        })),
+          items: items.map((item) => ({
+          name: item.name,
+          quantity: item.quantity,
+        })), 
       };
 
       await axios.post(`http://localhost:8081/orders/create`, orderData);
