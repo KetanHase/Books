@@ -10,6 +10,9 @@ import Book from './pages/Book';
 import Cart from './components/Cart';
 import Checkout from './components/Checkout';
 import Orders from './components/Order';
+import About from './pages/About';
+import Contact from './pages/Contact';
+ 
 
 interface User {
   id: number;
@@ -63,13 +66,15 @@ function App() {
       <Route path="/book" element={ <Book />  } />
       <Route path="/login" element={loggedIn ? <Navigate to="/" /> : <Login  />} />
       <Route path="/register" element={<Register />} />
-      
+      <Route path="/about" element={ <About />  } />
+      <Route path="/contact" element={ <Contact />  } />
+
       <Route path="/book/:id" element={<Book />} />
 
       {/* Cart route where users can add items to the cart without logging in */}
       <Route
         path="/cart"
-        element={loggedIn ? <Cart userId={user ? user.id : 0} proceedToCheckout={handleProceedToCheckout} /> : <Navigate to="/login" /> }
+        element={loggedIn ? <Cart  userId={user ? user.id : 0} proceedToCheckout={handleProceedToCheckout}  /> : <Navigate to="/login" /> }
       />
 
       {/* Checkout and Orders routes require login */}

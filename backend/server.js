@@ -377,6 +377,50 @@ app.put('/admin/orders/:id', (req, res) => {
   });
 });
 
+{/* Contact Form Api */}
+app.post('/contact', (req, res) => {
+  const { name, email, message } = req.body;
+
+  if (!name || !email || !message) {
+    return res.status(400).json({ error: 'Please fill out all fields.' });
+  }
+
+  const query = 'INSERT INTO contact (name, email, message) VALUES (?, ?, ?)';
+  db.query(query, [name, email, message], (err) => {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to submit message' });
+    }
+    res.status(200).json({ message: 'Message sent successfully!' });
+  });
+});
+
+app.post('/contacts', (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: 'Please fill out all fields.' });
+  }
+
+  const query = 'INSERT INTO contact_email (email) VALUES (?)';
+  db.query(query, [email], (err) => {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to submit message' });
+    }
+    res.status(200).json({ message: 'Message sent successfully!' });
+  });
+});
+
+app.get('/contactsemail', (req, res) => {
+  const sql = "SELECT * FROM contact_email";
+  db.query(sql, (err, data) => {
+    if (err) {
+      console.error('Error fetching Email:', err);
+      return res.status(500).json({ message: "Error fetching Email." });
+    }
+    return res.status(200).json(data);
+  });
+});
+
 
 app.get('/books/:id', (req, res) => {
     const sql = "SELECT * FROM book WHERE ID = ?";

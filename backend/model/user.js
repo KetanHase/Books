@@ -49,6 +49,7 @@ const getUserDetails = (req, res) => {
             book.author, 
             book.stock, 
             book.category_id, 
+            category.name AS category_name,
             book.price_category, 
             book.status, 
             book.imageFile,
@@ -56,6 +57,7 @@ const getUserDetails = (req, res) => {
              
         FROM book
         LEFT JOIN language ON book.language_id = language.id
+        LEFT JOIN category ON book.category_id = category.id
        ORDER BY book.id DESC
     `;
     db.query(sql, (err, data) => {

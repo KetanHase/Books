@@ -21,6 +21,7 @@ import AddPro from './AddBook';
 import { Book } from '../interfaces/Book';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import ViewBookDialog from './ViewBookDialog';
 
 interface TablePaginationActionsProps {
   count: number;
@@ -95,6 +96,7 @@ const BookList: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [open, setOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Partial<Book> | null>(null);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [filterCategory, setFilterCategory] = useState<string>("");
   
 
@@ -112,6 +114,13 @@ const handleOpen = (book?: Partial<Book>) => {
 };
 
 const handleClose = () => setOpen(false);
+
+const handleViewDialogOpen = (book: Partial<Book>) => {
+  setSelectedBook(book);
+  setViewDialogOpen(true);
+};
+
+const handleViewDialogClose = () => setViewDialogOpen(false);
 
 const handleDelete = async (id: number) => {
   try {
@@ -260,7 +269,7 @@ const handleChangePage = (
                   </Button>
                   <Button
                     variant="outlined" color="success" size="small" 
-                    onClick={() => handleDelete(book.id)}
+                    onClick={() => handleViewDialogOpen(book)}
                   >
                     View
                   </Button>
@@ -292,6 +301,7 @@ const handleChangePage = (
           </TableFooter>
         </Table>
       </TableContainer>
+      <ViewBookDialog open={viewDialogOpen} book={selectedBook} onClose={handleViewDialogClose} />
     </Container>
   );
 }

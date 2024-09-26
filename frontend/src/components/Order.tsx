@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Divider, Box, Button } from '@mui/material';
 import axios from 'axios';
 import moment from 'moment';
+import Footer from './Footer';
+import Navbar from './Navbar';
 
 interface Order {
   order_id: number;
@@ -17,10 +19,30 @@ interface Order {
   }[];
 } 
 
+ 
+
 const Order = ({ user }: { user: any }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [loggedIn, setLoggedIn] = useState<boolean>(false);
+  const [currentUser, setCurrentUser] = useState<any | null>(null);
+  useEffect(() => {
+    axios
+      .get('http://localhost:8081/check-session', { withCredentials: true })
+      .then((response) => {
+        setLoggedIn(response.data.loggedIn);
+        if (response.data.user) {
+          setCurrentUser(response.data.user);
+        }
+      })
+      .catch(() => {
+        setLoggedIn(false);
+        setCurrentUser(null);
+      });
+       
+  }, []);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -40,6 +62,8 @@ const Order = ({ user }: { user: any }) => {
 
 
   return (
+    <>
+    <Navbar userId={user?.id ?? 0} username={user?.username || ''} loggedIn={loggedIn} />
     <Box sx={{ padding: '20px' }}>
       <Typography variant="h4" gutterBottom>
         Orders for {user?.username}
@@ -112,6 +136,8 @@ const Order = ({ user }: { user: any }) => {
         </TableContainer>
       )}
     </Box>
+    <Footer />
+    </>
   );
 };
 

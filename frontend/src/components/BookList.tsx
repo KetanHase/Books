@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, SelectChangeEvent, CardActions, Button, Typography, Container, Grid, Box, Snackbar, Alert, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import axios from 'axios';
+import ViewBookDialog from './ViewBookDialog';
 
 interface BookListProps {
   userId: number;
@@ -14,50 +15,87 @@ interface Book {
   author: string;
   stock: number;
   imageFile: string;
+  status: string;
   price_category: string;  
   category_id: number;
+  category_name: string;
   language: string;
+  language_name: string;
 }
 
 interface Category {
   id: number;
   name: string;
 }
-const languages = ['English', 'Spanish', 'French', 'German']; // Example languages
+
+interface Language {
+  id: number;
+  name: string;
+}
+ 
 const BookList: React.FC<BookListProps> = ({ userId }) => {
   const [books, setBooks] = useState<Book[]>([]);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [languages, setLanguages] = useState<Language[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | string>('all');
+  const [selectedLanguage, setSelectedLanguage] = useState<string | number>('all');
   const [filterCategory, setFilterCategory] = useState<string>("");
-  const [selectedLanguage, setSelectedLanguage] = useState<string>("");
+   
+  const [dialogOpen, setDialogOpen] = useState(false); // State for dialog
+  const [selectedBook, setSelectedBook] = useState<Partial<Book> | null>(null); 
 
   useEffect(() => {
+
     axios.get('http://localhost:8081/categories')
       .then(response => setCategories(response.data))
       .catch(error => console.error("Error fetching categories", error));
+
+      axios.get('http://localhost:8081/languages') // Adjust to your language endpoint
+      .then(response => setLanguages(response.data))
+      .catch(error => console.error("Error fetching languages", error));
+
     fetchBooks();
   }, []);
 
-  const fetchBooks = (categoryId: number | string = 'all',language: string = '') => {
-    let url = 'http://localhost:8081/';
+  const fetchBooks = (categoryId: number | string = 'all', languageId: number | string = 'all') => {
+    let url = 'http://localhost:8081/'; // Base URL
+  
+    // Add query parameters for category and language filters
+    const queryParams: string[] = [];
+    
     if (categoryId !== 'all') {
-      url = `http://localhost:8081/book/category/${categoryId}`;
+      queryParams.push(`categoryId=${categoryId}`);
     }
-    if (language) {
-      url += `?language=${language}`; // Assuming you have a query parameter for language
+    
+    if (languageId !== 'all') {
+      queryParams.push(`languageId=${languageId}`);
     }
+    
+    // If there are query parameters, append them to the URL
+    if (queryParams.length > 0) {
+      url += `?${queryParams.join('&')}`;
+    }
+  
     axios.get(url)
       .then(response => setBooks(response.data))
       .catch(error => console.error("Error fetching books", error));
   };
+  
+  
 
   const handleCategoryChange = (event: SelectChangeEvent<number | string>) => {
     const categoryId = event.target.value as number | string;
     setSelectedCategory(categoryId);
-    fetchBooks(categoryId);
+    fetchBooks(categoryId, selectedLanguage); // Fetch based on selected category and language
   };
-
+  
+  const handleLanguageChange = (event: SelectChangeEvent<number | string>) => {
+    const languageId = event.target.value;
+    setSelectedLanguage(languageId);
+    fetchBooks(selectedCategory, languageId); // Fetch based on selected language and category
+  };
+  
   const addToCart = (book: Book) => {
     if (userId === 0) {
       alert("Please log in to add items to your cart.");
@@ -84,18 +122,23 @@ const BookList: React.FC<BookListProps> = ({ userId }) => {
     setSnackbarOpen(false);
   };
 
-  const handleLanguageChange = (event: SelectChangeEvent<string>) => {
-    const language = event.target.value;
-    setSelectedLanguage(language);
-    fetchBooks(selectedCategory, language);
+  const handleQuickView = (book: Book) => {
+    setSelectedBook(book);
+    setDialogOpen(true);
+  };
+
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+    setSelectedBook(null);
   };
 
   const filteredBooks = books.filter(book => {
-    const categoryMatch = selectedCategory === 'all' || book.category_id === selectedCategory;
+    const categoryMatch = selectedCategory === 'all' || book.category_id === +selectedCategory;
     const priceMatch = filterCategory ? book.price_category === filterCategory : true;
-    const languageMatch = selectedLanguage ? book.language === selectedLanguage : true;
+    const languageMatch = selectedLanguage === 'all' || book.language === selectedLanguage;
     return categoryMatch && priceMatch && languageMatch;
-  });
+ }); 
+
   const formControlStyles = {
     mt: { xs: 2, sm: 3 },
     mb: { xs: 3, sm: 5 },
@@ -113,7 +156,7 @@ const BookList: React.FC<BookListProps> = ({ userId }) => {
 
       
 <FormControl size="small" sx={formControlStyles}>
-  <Typography variant='h6'>Select Category</Typography>
+  <Typography variant='h6'>Sort By Category</Typography>
   <Select value={selectedCategory} onChange={handleCategoryChange}>
     <MenuItem value="all">All Categories</MenuItem>
     {categories.map((category) => (
@@ -139,13 +182,14 @@ const BookList: React.FC<BookListProps> = ({ userId }) => {
 </FormControl>
 
 <FormControl size="small" sx={formControlStyles}>
-  <Typography variant='h6'>Select Language</Typography>
+  <Typography variant='h6'>Sort by Language</Typography>
   <Select value={selectedLanguage} onChange={handleLanguageChange}>
-    <MenuItem value="">All Languages</MenuItem>
-    {languages.map((language, index) => (
-      <MenuItem key={index} value={language}>
-        {language}
-      </MenuItem>
+     
+    <MenuItem value="all">All Languages</MenuItem>
+          {languages.map(language => (
+            <MenuItem key={language.id} value={language.id}>
+              {language.name}
+            </MenuItem>
     ))}
   </Select>
 </FormControl>
@@ -182,18 +226,27 @@ const BookList: React.FC<BookListProps> = ({ userId }) => {
                   <Typography variant="h6" component="div" gutterBottom>
                     {book.name}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body1" color="text.secondary">
                     Price: Rs {book.price}
                   </Typography>
-                  <Typography variant="h6" component="div" gutterBottom>
-                    {book.author}
+                  <Typography variant="body2" color="text.secondary"  style={{ width: 100,color: book.status === 'Available' ? 'green' : 'red' }}>
+                     {book.status}
+                  </Typography>
+                  <Typography variant="body2" component="div" gutterBottom>
+                   Author: {book.author}
+                  </Typography>
+                  <Typography variant="body2" component="div" gutterBottom>
+                   Category: {book.category_name}
+                  </Typography>
+                  <Typography variant="body2" component="div" gutterBottom>
+                   Language: {book.language_name}
                   </Typography>
                 </CardContent>
                 <CardActions>
                   <Button size="small" variant="contained" color="warning" sx={{mr: 2}} onClick={() => addToCart(book)}  >
                     Add to cart
                   </Button>
-                  <Button size="small" variant="contained" color="info"  onClick={() => addToCart(book)}  >
+                  <Button size="small" variant="contained" color="info"  onClick={() => handleQuickView(book)}  >
                        Quick View
                   </Button>
                 </CardActions>
@@ -213,6 +266,8 @@ const BookList: React.FC<BookListProps> = ({ userId }) => {
           Item added to cart successfully!
         </Alert>
       </Snackbar>
+
+      <ViewBookDialog open={dialogOpen} book={selectedBook} onClose={handleDialogClose} />
     </Box>
   );
 };

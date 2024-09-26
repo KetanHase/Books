@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
   Typography,
@@ -19,6 +19,13 @@ import mastercardLogo from '../assets/mastercard.png'; // Ensure you have the im
 import visaLogo from '../assets/visa.png';
 import paypalLogo from '../assets/paypal.png';
 import { Navigate } from 'react-router-dom';
+import Footer from './Footer';
+import Navbar from './Navbar';
+
+interface User {
+  id: number;
+  username: string;
+}
 
 const Checkout = ({ userId }: { userId: number }) => {
   const { items, totalAmount, loading } = useCartData(userId);
@@ -34,8 +41,27 @@ const Checkout = ({ userId }: { userId: number }) => {
   const [email, setEmail] = useState<string>('');
   const [expiryDate, setExpiryDate] = useState('');
   const [cvv, setCvv] = useState('');
+  const [loggedIn, setLoggedIn] = useState<boolean>(false);
+  const [user, setUser] = useState<User | null>(null);
+   
 
+  useEffect(() => {
+    axios
+      .get('http://localhost:8081/check-session', { withCredentials: true })
+      .then((response) => {
+        setLoggedIn(response.data.loggedIn);
+        if (response.data.user) {
+          setUser(response.data.user as User);
+        }
+      })
+      .catch(() => {
+        setLoggedIn(false);
+        setUser(null);
+      });
+       
+  }, []);
 
+  
   const handleOrder = async () => {
     setIsOrdering(true);
     setOrderStatus(null);
@@ -78,7 +104,9 @@ const Checkout = ({ userId }: { userId: number }) => {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <>
+    <Navbar userId={user?.id ?? 0} username={user?.username || ''} loggedIn={loggedIn} />
+    <Grid style={{ padding: '20px' }}>
       {/* Full Width Title */}
       <Grid container spacing={3}>
         <Grid item xs={12}>
@@ -326,7 +354,10 @@ const Checkout = ({ userId }: { userId: number }) => {
           </Alert>
         </Snackbar>
       </Grid>
-    </div>
+      
+      </Grid>
+      <Footer />
+    </>
   );
 };
 

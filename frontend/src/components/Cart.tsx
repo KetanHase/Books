@@ -4,6 +4,8 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Navbar from './Navbar';
+import Footer from './Footer';
  
  
 
@@ -23,10 +25,35 @@ interface CartProps {
   proceedToCheckout: () => void;
 }
 
+interface User {
+  id: number;
+  username: string;
+}
+
 const Cart: React.FC<CartProps> = ({ userId, proceedToCheckout }) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [loggedIn, setLoggedIn] = useState<boolean>(false);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    axios
+      .get('http://localhost:8081/check-session', { withCredentials: true })
+      .then((response) => {
+        setLoggedIn(response.data.loggedIn);
+        if (response.data.user) {
+          setUser(response.data.user as User);
+        }
+      })
+      .catch(() => {
+        setLoggedIn(false);
+        setUser(null);
+      })
+      .finally(() => {
+        setLoading(false); // Stop loading once session check is done
+      });
+  }, []);
 
   useEffect(() => {
     
@@ -87,7 +114,8 @@ const Cart: React.FC<CartProps> = ({ userId, proceedToCheckout }) => {
   return (
     
       
-    
+    <>
+    <Navbar userId={user?.id ?? 0} username={user?.username || ''} loggedIn={loggedIn} />
       <Grid container spacing={4} padding={2}>
          
       <Grid item xs={12} md={12}>
@@ -240,10 +268,12 @@ const Cart: React.FC<CartProps> = ({ userId, proceedToCheckout }) => {
       </Paper>
       </Grid>
     </Grid>
-
+    <Footer />
+    </>
     
   );
    
 };
+
 
 export default Cart;

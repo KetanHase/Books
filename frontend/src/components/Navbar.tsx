@@ -104,18 +104,18 @@ const Navbar: React.FC<NavProps> = ({ userId, loggedIn,username  } ) => {
             <Link href="/book" underline="none" color="inherit" sx={{ fontSize: '16px' }}>
               Book
             </Link>
-            <Link href="#" underline="none" color="inherit" sx={{ fontSize: '16px' }}>
+            <Link href="/about" underline="none" color="inherit" sx={{ fontSize: '16px' }}>
               About
             </Link>
-            <Link href="#" underline="none" color="inherit" sx={{ fontSize: '16px' }}>
+            <Link href="/contact" underline="none" color="inherit" sx={{ fontSize: '16px' }}>
               Contact
             </Link>
-            <Link href="#" underline="none" color="inherit" sx={{ fontSize: '16px' }}>
+           {/*  <Link href="#" underline="none" color="inherit" sx={{ fontSize: '16px' }}>
               FAQ
             </Link>
             <Link href="#" underline="none" color="inherit" sx={{ fontSize: '16px' }}>
               Blog
-            </Link>
+            </Link>*/}
           </Box>
 
           {/* Mobile Menu Button */}
