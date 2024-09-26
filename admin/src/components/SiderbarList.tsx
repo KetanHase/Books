@@ -76,7 +76,7 @@ export const SidebarListItems = () => {
         <ListItemText primary="Language" /> 
       </ListItemButton>
 
-      <ListItemButton>
+     {/* <ListItemButton>
         <ListItemIcon>
           <LayersIcon />
         </ListItemIcon>
@@ -103,7 +103,7 @@ export const SidebarListItems = () => {
           <AssignmentIcon />
         </ListItemIcon>
         <ListItemText primary="Year-end sale" />
-      </ListItemButton>
+      </ListItemButton>*/} 
     </React.Fragment>
   );
 };

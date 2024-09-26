@@ -186,6 +186,15 @@ const Navbar: React.FC<NavProps> = ({ userId, loggedIn,username  } ) => {
           onKeyDown={toggleDrawer(false)}
         >
           <List>
+            
+           
+          <ListItem disablePadding>
+            <ListItemButton href='/login'>
+            <Button variant='outlined' color='info'>Signin</Button> 
+            <Button variant='outlined' color='error' sx={{displsy:'flex-end', margin:2}}>LogOut</Button> 
+            </ListItemButton>
+          </ListItem>
+         
             <ListItem disablePadding>
               <ListItemButton href="/">
                 <ListItemText primary="Home" />
@@ -197,25 +206,17 @@ const Navbar: React.FC<NavProps> = ({ userId, loggedIn,username  } ) => {
               </ListItemButton>
             </ListItem>
             <ListItem disablePadding>
-              <ListItemButton>
+              <ListItemButton href="/about">
                 <ListItemText primary="About" />
               </ListItemButton>
             </ListItem>
             <ListItem disablePadding>
-              <ListItemButton>
+              <ListItemButton href="/contact">
                 <ListItemText primary="Contact" />
               </ListItemButton>
             </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton>
-                <ListItemText primary="FAQ" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton>
-                <ListItemText primary="Blog" />
-              </ListItemButton>
-            </ListItem>
+             
+             
           </List>
         </Box>
       </Drawer>

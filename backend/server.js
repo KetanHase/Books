@@ -394,6 +394,17 @@ app.post('/contact', (req, res) => {
   });
 });
 
+app.get('/getcontact', (req, res) => {
+  const sql = "SELECT * FROM contact";
+  db.query(sql, (err, data) => {
+    if (err) {
+      console.error('Error fetching Email:', err);
+      return res.status(500).json({ message: "Error fetching Email." });
+    }
+    return res.status(200).json(data);
+  });
+});
+
 app.post('/contacts', (req, res) => {
   const { email } = req.body;
 
