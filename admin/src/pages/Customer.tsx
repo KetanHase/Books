@@ -17,6 +17,7 @@ import { useMediaQuery } from '@material-ui/core';
 import BookList from '../components/BookList';
 import axios from 'axios';
 import OrderList from '../components/OrderList';
+import ContactTable from '../components/ContactTable';
  
 
 interface user {
@@ -87,7 +88,7 @@ export default function Customer() {
                     
                   }}
                 >
-                 <OrderList />
+                 <ContactTable />
                 </Paper>
               </Grid>
               {/*Start Seperate Component */}

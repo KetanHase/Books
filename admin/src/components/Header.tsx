@@ -24,6 +24,8 @@ import Logout from '@mui/icons-material/Logout';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import NotificationBadge from './NotificationBadge';
+import EmailBadge from './EmailBadge';
 
 
 interface DashboardProps {
@@ -124,13 +126,14 @@ const Header: React.FC<AppBarProps & DashboardProps> = ({ open, toggleDrawer, us
             </Typography>
 
             <IconButton color="inherit">
-              <Badge badgeContent={4} color="secondary">
-                <MailIcon sx={{ fontSize: 25 }} />
+              <Badge   color="secondary">
+              <EmailBadge />
               </Badge>
             </IconButton>
             <IconButton color="inherit">
-              <Badge badgeContent={17} color="secondary">
-                <NotificationsIcon />
+              <Badge color="secondary">
+                 
+                <NotificationBadge />
               </Badge>
             </IconButton>
 
@@ -147,7 +150,7 @@ const Header: React.FC<AppBarProps & DashboardProps> = ({ open, toggleDrawer, us
               </IconButton>
             </Tooltip>
             <IconButton onClick={handleClick}>
-              <Typography variant='body1'sx={{ fontFamily: 'root',color:'white' }} >{user?.username || 'Guest'} </Typography>
+              <Typography variant='body1'sx={{ fontFamily: 'root',color:'white' }} >{user?.username} </Typography>
             <KeyboardArrowDownIcon />
             </IconButton>
             
@@ -186,13 +189,13 @@ const Header: React.FC<AppBarProps & DashboardProps> = ({ open, toggleDrawer, us
               transformOrigin={{ horizontal: 'right', vertical: 'top' }}
               anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             >
-              <MenuItem onClick={handleClose}>
+             {/*  <MenuItem onClick={handleClose}>
                 <Avatar sx={{ mr: 1 }} /> Profile
               </MenuItem>
               <MenuItem onClick={handleClose}>
                 <Avatar sx={{ mr: 1 }} /> My account
               </MenuItem>
-              <Divider />
+              <Divider />*/}
               <MenuItem onClick={handleClose}>
                 <ListItemIcon>
                   <PersonAdd fontSize="small" />

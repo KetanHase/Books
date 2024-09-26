@@ -7,10 +7,10 @@ import ListSubheader from '@mui/material/ListSubheader';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import PeopleIcon from '@mui/icons-material/People';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import LayersIcon from '@mui/icons-material/Layers';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import Collapse from '@mui/material/Collapse';
+import ContactPageOutlinedIcon from '@mui/icons-material/ContactPageOutlined';
+import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
+import LanguageOutlinedIcon from '@mui/icons-material/LanguageOutlined';
+import ClassOutlinedIcon from '@mui/icons-material/ClassOutlined';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
 import ListOutlinedIcon from '@mui/icons-material/ListOutlined';
@@ -49,29 +49,35 @@ export const SidebarListItems = () => {
 
       <ListItemButton component={Link} to="/customer" >
         <ListItemIcon>
-          <PeopleIcon />
+          <ContactPageOutlinedIcon />
         </ListItemIcon>
         <ListItemText primary="Customers" />
       </ListItemButton>
      
+      <ListItemButton component={Link} to="/newcustomer" >
+        <ListItemIcon>
+          <PeopleIcon />
+        </ListItemIcon>
+        <ListItemText primary="New Customers" />
+      </ListItemButton>
 
       <ListItemButton component={Link} to="/category">
         <ListItemIcon>
-          <BarChartIcon />
+          <ClassOutlinedIcon />
         </ListItemIcon>
         <ListItemText primary="Category" /> 
       </ListItemButton>
 
       <ListItemButton component={Link} to="/book">
         <ListItemIcon>
-          <BarChartIcon />
+          <MenuBookOutlinedIcon />
         </ListItemIcon>
         <ListItemText primary="Book" /> 
       </ListItemButton>
 
       <ListItemButton component={Link} to="/language">
         <ListItemIcon>
-          <BarChartIcon />
+          <LanguageOutlinedIcon />
         </ListItemIcon>
         <ListItemText primary="Language" /> 
       </ListItemButton>

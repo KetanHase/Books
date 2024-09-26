@@ -11,31 +11,30 @@ import Sidebar from '../components/Sidebar';
 import Footer from '../components/Footer';  
 import { Toolbar, Typography } from '@mui/material';
 import Orders from '../components/Orders';
- 
 import Form from '../components/Title';
 import { useMediaQuery } from '@material-ui/core';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import OrderList from '../components/OrderList';
-import DashboardCards from '../components/DashboardCards';
-import ContactEmailTable from '../components/ContactEmailTable';
-import ContactTable from '../components/ContactTable';
  
+import BookList from '../components/BookList';
+import axios from 'axios';
+import OrderList from '../components/OrderList';
+import ContactTable from '../components/ContactTable';
+import ContactEmailTable from '../components/ContactEmailTable';
+ 
+
 interface user {
   id: number;
   username: string;
 }
 
+
+
  
 
 const defaultTheme = createTheme();
 
-const Dashboard: React.FC  = () => {
-  const [loggedIn, setLoggedIn] = React.useState(false);
-  const [user, setUser] = React.useState<user | null>(null);
-  const navigate = useNavigate();
-
+export default function CustomerEmail() {
   const [open, setOpen] = React.useState(true);
+  const [user, setUser] = React.useState<user | null>(null);
   const isMobile = useMediaQuery('(max-width: 768px)');
   const toggleDrawer = () => {
     setOpen(!open);
@@ -45,6 +44,7 @@ const Dashboard: React.FC  = () => {
       setOpen(false);  
     }
   }, [isMobile]);
+
   React.useEffect(() => {
     // Fetch the user data from the session or API
     axios.get('http://localhost:8081/check-session', { withCredentials: true })
@@ -55,13 +55,12 @@ const Dashboard: React.FC  = () => {
             console.error('Error fetching user:', error);
         });
 }, []);
- 
 
   return (
     <ThemeProvider theme={defaultTheme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
-        <Header  open={open} toggleDrawer={toggleDrawer} user={user}  /> {/* Use Header component */}
+        <Header  open={open} toggleDrawer={toggleDrawer} user={user} /> {/* Use Header component */}
         <Sidebar open={open} toggleDrawer={toggleDrawer} /> {/* Use Sidebar component */}
         <Box
           component="main"
@@ -81,21 +80,6 @@ const Dashboard: React.FC  = () => {
         {/*Dashboard Contain Start */}
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
             <Grid container spacing={3}>
-               {/*Start Seperate Component */}
-               <Grid item xs={12} md={8} lg={12}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    
-                  }}
-                >
-                 <DashboardCards />
-                </Paper>
-              </Grid>
-              {/*End Seperate Component */}
-              {/*Start Seperate Component */}
               <Grid item xs={12} md={8} lg={12}>
                 <Paper
                   sx={{
@@ -108,7 +92,6 @@ const Dashboard: React.FC  = () => {
                  <ContactEmailTable />
                 </Paper>
               </Grid>
-              {/*End Seperate Component */}
               {/*Start Seperate Component */}
               <Grid item xs={12} md={8} lg={12}>
                 <Paper
@@ -119,7 +102,6 @@ const Dashboard: React.FC  = () => {
                     
                   }}
                 >
-                 <ContactTable />
                 </Paper>
               </Grid>
               {/*End Seperate Component */}
@@ -133,11 +115,10 @@ const Dashboard: React.FC  = () => {
                     
                   }}
                 >
-                 <OrderList />
-                </Paper>
-              </Grid>
-              {/*End Seperate Component */}
              
+                </Paper>
+              </Grid>
+              {/*End Seperate Component */}
             </Grid>
           </Container>
         {/*Dashboard Contain End */}
@@ -148,6 +129,3 @@ const Dashboard: React.FC  = () => {
     </ThemeProvider>
   );
 }
-
-
-export default Dashboard;

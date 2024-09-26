@@ -5,6 +5,7 @@ const multer = require('multer');
 const path = require('path');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+
  
 const { getUserDetails, createUser ,updateUser ,deleteuser,getCategories,getLanguages} = require('./model/user');
 
@@ -47,8 +48,9 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: { secure: false,
-      //maxAge: 1000 * 30 // 30 seconds
-    maxAge: 1000 * 60 * 30   // 30 minutes 
+      //maxAge: 1000 * 30 ,// 30 seconds
+    maxAge: 1000 * 60 * 30 ,
+    sameSite: 'lax'   // 30 minutes 
 
      }  // Set to true if using HTTPS
 }));
@@ -431,6 +433,31 @@ app.get('/contactsemail', (req, res) => {
     return res.status(200).json(data);
   });
 });
+
+{/* Dashboard Count */}
+app.get('/dashboardCounts', (req, res) => {
+  const sql = `
+    SELECT 
+      (SELECT COUNT(*) FROM book) as books,
+      (SELECT COUNT(*) FROM orders) as orders,
+      (SELECT COUNT(*) FROM language) as language,
+      (SELECT COUNT(*) FROM category) as category,
+      (SELECT COUNT(*) FROM contact) as contact,
+      (SELECT COUNT(*) FROM users) as users;
+  `;
+
+  db.query(sql, (err, data) => {
+    if (err) {
+      console.error('Error fetching counts:', err);
+      return res.status(500).json({ message: "Error fetching counts." });
+    }
+    
+    // 'data' is an array with a single object containing all counts
+    return res.status(200).json(data[0]);  // Return the first (and only) row
+  });
+});
+
+
 
 
 app.get('/books/:id', (req, res) => {

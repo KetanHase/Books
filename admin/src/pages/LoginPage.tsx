@@ -31,16 +31,18 @@ const Login: React.FC = () => {
             console.log(response.data);  
             if (response.data.success) {
                  
-                toast.success('Login Successful!', { position: "top-right" });
+                toast.success('Login Successful!', { position: "top-center" });
                 //alert('login Sucessfull');
                 //navigate('/dashboard');
                 window.location.href = '/dashboard';
             } else {
                 //setMessage(response.data.message || 'Login failed. Please check your credentials.');
                 toast.error(response.data.message || 'Login failed. Please check your credentials.', { position: "top-right" });
+                
             }
         } catch (error) {
             toast.error('Login failed. Please check your credentials.', { position: "top-right" });
+            toast.error('Access Denied Only Admin Can Login.', { position: "top-right" });
         }
     };
 

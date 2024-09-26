@@ -18,7 +18,9 @@ const Footer: React.FC = () => {
           variant="body2"
           color="textSecondary"
           align="center"
-          sx={{ mt: 4 ,py:4, backgroundColor:'#51606e'}}>
+          sx={{ mt: 4 ,py:4 ,
+             
+             backgroundColor:'#51606e'}}>
           {'Copyright © '}
           <Link href="/" color="textSecondary">
            Book Store
