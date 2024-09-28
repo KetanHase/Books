@@ -100,7 +100,7 @@ export default function Category() {
                     
                   }}
                 >
-                 <Form />
+                 
                 </Paper>
               </Grid>
               {/*End Seperate Component */}

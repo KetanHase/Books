@@ -322,7 +322,7 @@ const Checkout = ({ userId }: { userId: number }) => {
      </Grid>
 
         {/* Place Order Button */}
-        <Grid 
+       {/*   <Grid 
           container 
           spacing={3} 
           justifyContent="center" 
@@ -338,7 +338,7 @@ const Checkout = ({ userId }: { userId: number }) => {
               {isOrdering ? <CircularProgress size={24} /> : 'Place Order'}
             </Button>
           </Grid>
-        </Grid>
+        </Grid> */}
 
         {/* Snackbar for success/error message */}
         <Snackbar

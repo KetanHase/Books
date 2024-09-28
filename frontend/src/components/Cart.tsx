@@ -186,86 +186,91 @@ const Cart: React.FC<CartProps> = ({ userId, proceedToCheckout }) => {
       </Grid>
       <Divider />
       <Grid item xs={12} md={4}>
-    <Paper variant="outlined">
-      <Box padding={2}>
-        <Grid container justifyContent="space-between" alignItems="center">
-          {/* Content Name (Total Items) */}
-          <Grid item xs={6}>
-            <Typography variant="body1">Total Items:-</Typography>
-          </Grid>
-          {/* Price */}
-          <Grid item xs={6} style={{ textAlign: 'right' }}>
-            <Typography variant="body1">{items.length}</Typography>
-          </Grid>
+      {items.length > 0 ? (
+  <Paper variant="outlined">
+    <Box padding={2}>
+      <Grid container justifyContent="space-between" alignItems="center">
+        {/* Content Name (Total Items) */}
+        <Grid item xs={6}>
+          <Typography variant="body1">Total Items:-</Typography>
         </Grid>
-
-        {/* Divider */}
-        <Divider style={{ margin: '20px 0' }} />
-
-        {/* Total Gross */}
-        <Grid container justifyContent="space-between" alignItems="center">
-          <Grid item xs={6}>
-            <Typography variant="body1">Sub Total:-</Typography>
-          </Grid>
-          <Grid item xs={6} style={{ textAlign: 'right' }}>
-            <Typography variant="body1">₹{totalAmount}</Typography>
-          </Grid>
+        {/* Price */}
+        <Grid item xs={6} style={{ textAlign: 'right' }}>
+          <Typography variant="body1">{items.length}</Typography>
         </Grid>
+      </Grid>
 
-        {/* Divider */}
-        <Divider style={{ margin: '20px 0' }} />
+      {/* Divider */}
+      <Divider style={{ margin: '20px 0' }} />
 
-        {/* Total Gross */}
-        <Grid container justifyContent="space-between" alignItems="center">
-          <Grid item xs={6}>
-            <Typography variant="body1">Total Gross:-</Typography>
-          </Grid>
-          <Grid item xs={6} style={{ textAlign: 'right' }}>
-            <Typography variant="body1">₹{totalAmount}</Typography>
-          </Grid>
+      {/* Sub Total */}
+      <Grid container justifyContent="space-between" alignItems="center">
+        <Grid item xs={6}>
+          <Typography variant="body1">Sub Total:-</Typography>
         </Grid>
-
-        {/* Divider */}
-        <Divider style={{ margin: '20px 0' }} />
-
-        {/* Amount Payable */}
-        <Grid container justifyContent="space-between" alignItems="center">
-          <Grid item xs={6}>
-            <Typography variant="h6">Amount Payable:-</Typography>
-          </Grid>
-          <Grid item xs={6} style={{ textAlign: 'right' }}>
-            <Typography variant="h6" color="primary">₹{totalAmount}</Typography>
-          </Grid>
+        <Grid item xs={6} style={{ textAlign: 'right' }}>
+          <Typography variant="body1">₹{totalAmount}</Typography>
         </Grid>
+      </Grid>
 
-        {/* Proceed to Pay Button */}
-        <Divider style={{ margin: '20px 0' }} />
-        <Box textAlign="center" mt={2}>
-          <Button
-            variant="outlined"
-            
-            fullWidth
-            size='small'
-            onClick={proceedToCheckout}
-            sx={{
-              
-              '&:hover': {
-                backgroundColor: '#FDC900',
-              },
-              borderRadius: '8px',
-              padding: '12px 20px',
-              textTransform: 'none',
-              fontSize: '16px',
-            }}
-          >
-            Proceed To Pay
-          </Button>
-        </Box>
-        <Typography variant="body2" color="textSecondary" align="right" style={{ marginTop: '10px' }}>
-          Shipping (India): Free | Ships within 18-20 days.
-        </Typography>
+      {/* Divider */}
+      <Divider style={{ margin: '20px 0' }} />
+
+      {/* Total Gross */}
+      <Grid container justifyContent="space-between" alignItems="center">
+        <Grid item xs={6}>
+          <Typography variant="body1">Total Gross:-</Typography>
+        </Grid>
+        <Grid item xs={6} style={{ textAlign: 'right' }}>
+          <Typography variant="body1">₹{totalAmount}</Typography>
+        </Grid>
+      </Grid>
+
+      {/* Divider */}
+      <Divider style={{ margin: '20px 0' }} />
+
+      {/* Amount Payable */}
+      <Grid container justifyContent="space-between" alignItems="center">
+        <Grid item xs={6}>
+          <Typography variant="h6">Amount Payable:-</Typography>
+        </Grid>
+        <Grid item xs={6} style={{ textAlign: 'right' }}>
+          <Typography variant="h6" color="primary">₹{totalAmount}</Typography>
+        </Grid>
+      </Grid>
+
+      {/* Proceed to Pay Button */}
+      <Divider style={{ margin: '20px 0' }} />
+      <Box textAlign="center" mt={2}>
+        <Button
+          variant="outlined"
+          fullWidth
+          size='small'
+          onClick={proceedToCheckout}
+          sx={{
+            '&:hover': {
+              backgroundColor: '#FDC900',
+            },
+            borderRadius: '8px',
+            padding: '12px 20px',
+            textTransform: 'none',
+            fontSize: '16px',
+          }}
+        >
+          Proceed To Pay
+        </Button>
       </Box>
-      </Paper>
+      <Typography variant="body2" color="textSecondary" align="right" style={{ marginTop: '10px' }}>
+        Shipping (India): Free | Ships within 18-20 days.
+      </Typography>
+    </Box>
+  </Paper>
+) : (
+  <Typography variant="body1" color="textSecondary" align="center">
+    Your cart is empty.
+  </Typography>
+)}
+
       </Grid>
     </Grid>
     <Footer />

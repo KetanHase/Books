@@ -102,7 +102,7 @@ export default function Language() {
                     
                   }}
                 >
-                 <Form />
+                 
                 </Paper>
               </Grid>
               {/*End Seperate Component */}

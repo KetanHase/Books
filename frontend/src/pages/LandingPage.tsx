@@ -60,6 +60,7 @@ const LandingPage: React.FC = () => {
     })
     .then(() => {
       console.log('Book added to cart');
+      window.location.reload();
     })
     .catch((error) => {
       console.error('Error adding book to cart:', error);

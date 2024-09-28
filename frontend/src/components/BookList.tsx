@@ -109,6 +109,7 @@ const BookList: React.FC<BookListProps> = ({ userId }) => {
       .then(() => {
         setSnackbarOpen(true);
         console.log('Book added to cart');
+        window.location.reload();
       })
       .catch(error => {
         console.error('Error adding book to cart:', error);

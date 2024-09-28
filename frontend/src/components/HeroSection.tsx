@@ -66,8 +66,8 @@ const HeroSection: React.FC = () => {
             fontSize: { xs: '14px', sm: '16px', md: '18px' },
           }}
         >
-          Explore our Book, delivering high-quality   to your needs. Elevate your
-          experience with top-tier features and services.
+          Explore our Book, delivering high-quality  to your needs. R:18No:20.16e4.19c2.8mate:5xa:3.2,8..2. Elevate your
+          experience with top-tier features and services 
         </Typography>
 
         {/* Email Input and Button */}
