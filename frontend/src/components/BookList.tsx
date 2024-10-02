@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, SelectChangeEvent, CardActions, Button, Typography, Container, Grid, Box, Snackbar, Alert, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import axios from 'axios';
 import ViewBookDialog from './ViewBookDialog';
+import CategorySlider from './CategorySlider';
 
 interface BookListProps {
   userId: number;
@@ -26,6 +27,7 @@ interface Book {
 interface Category {
   id: number;
   name: string;
+  image: string;
 }
 
 interface Language {
@@ -58,7 +60,7 @@ const BookList: React.FC<BookListProps> = ({ userId }) => {
     fetchBooks();
   }, []);
 
-  const fetchBooks = (categoryId: number | string = 'all', languageId: number | string = 'all') => {
+ /* const fetchBooks = (categoryId: number | string = 'all', languageId: number | string = 'all') => {
     let url = 'http://localhost:8081/'; // Base URL
   
     // Add query parameters for category and language filters
@@ -80,20 +82,47 @@ const BookList: React.FC<BookListProps> = ({ userId }) => {
     axios.get(url)
       .then(response => setBooks(response.data))
       .catch(error => console.error("Error fetching books", error));
-  };
+  }; */
   
+  const fetchBooks = (categoryId: number | string = 'all' ) => {
+    let url = 'http://localhost:8081/'; // Base URL
+    
+    // Build query string based on category and language
+    const queryParams: string[] = [];
+    
+    if (categoryId !== 'all') {
+      queryParams.push(`categoryId=${categoryId}`);
+    }
+    
+    
+    
+    // If there are query parameters, append them to the URL
+    if (queryParams.length > 0) {
+      url += `?${queryParams.join('&')}`;
+    }
+    
+    // Fetch books based on filters
+    axios.get(url)
+      .then(response => setBooks(response.data))
+      .catch(error => console.error("Error fetching books", error));
+  };
+
+  const handleCategoryClick = (categoryId: number | string) => {
+    setSelectedCategory(categoryId);
+    fetchBooks(categoryId);
+  };
   
 
   const handleCategoryChange = (event: SelectChangeEvent<number | string>) => {
     const categoryId = event.target.value as number | string;
     setSelectedCategory(categoryId);
-    fetchBooks(categoryId, selectedLanguage); // Fetch based on selected category and language
+    fetchBooks(categoryId ); // Fetch based on selected category and language
   };
   
   const handleLanguageChange = (event: SelectChangeEvent<number | string>) => {
     const languageId = event.target.value;
     setSelectedLanguage(languageId);
-    fetchBooks(selectedCategory, languageId); // Fetch based on selected language and category
+    fetchBooks(selectedCategory ); // Fetch based on selected language and category
   };
   
   const addToCart = (book: Book) => {
@@ -133,12 +162,16 @@ const BookList: React.FC<BookListProps> = ({ userId }) => {
     setSelectedBook(null);
   };
 
-  const filteredBooks = books.filter(book => {
+  /*const filteredBooks = books.filter(book => {
     const categoryMatch = selectedCategory === 'all' || book.category_id === +selectedCategory;
     const priceMatch = filterCategory ? book.price_category === filterCategory : true;
     const languageMatch = selectedLanguage === 'all' || book.language === selectedLanguage;
     return categoryMatch && priceMatch && languageMatch;
- }); 
+ });  */
+
+ const filteredBooks = books.filter(book => 
+  selectedCategory === 'all' || book.category_id === +selectedCategory
+);
 
   const formControlStyles = {
     mt: { xs: 2, sm: 3 },
@@ -156,7 +189,7 @@ const BookList: React.FC<BookListProps> = ({ userId }) => {
       </Typography>
 
       
-<FormControl size="small" sx={formControlStyles}>
+{/* <FormControl size="small" sx={formControlStyles}>
   <Typography variant='h6'>Sort By Category</Typography>
   <Select value={selectedCategory} onChange={handleCategoryChange}>
     <MenuItem value="all">All Categories</MenuItem>
@@ -193,7 +226,12 @@ const BookList: React.FC<BookListProps> = ({ userId }) => {
             </MenuItem>
     ))}
   </Select>
-</FormControl>
+</FormControl>*/}
+
+       <CategorySlider
+        categories={categories}
+        onCategoryClick={handleCategoryClick}
+      />
 
       <Container maxWidth="lg" sx={{ mt: 4 }}>
         <Grid container spacing={4} justifyContent="center">

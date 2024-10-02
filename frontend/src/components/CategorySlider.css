@@ -1,0 +1,107 @@
+.slider-container {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center the slider */
+    position: relative;
+    width: 100%;
+    padding: 20px; /* Add padding around the container */
+}
+
+.slider {
+    overflow: hidden; /* Hide extra slides */
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.slider-track {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    width: fit-content; /* Adjust the width to fit content */
+}
+
+.slide {
+    flex: 0 0 16%; /* Each slide takes 16% of the width (approximately 6 items visible) */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 5px; /* Maintain margin for spacing */
+    cursor: pointer;
+}
+
+.category-image {
+    width: 80px; /* Fixed width */
+    height: 80px; /* Fixed height */
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+    transition: transform 0.3s ease;
+}
+
+.slide:hover .category-image {
+    transform: scale(1.1);
+}
+
+.slide p {
+    margin-top: 10px;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Slider buttons */
+.slider-button {
+    background-color: #1976d2;
+    color: white;
+    border-radius: 50%;
+    min-width: 40px;
+    min-height: 40px;
+    border: none;
+    cursor: pointer;
+    position: absolute; /* Position buttons absolutely */
+    z-index: 1; /* Ensure buttons are on top */
+}
+
+.slider-button.left {
+    left: 10px; /* Position on the left */
+    top: 50%; /* Center vertically */
+    transform: translateY(-50%); /* Adjust for perfect centering */
+}
+
+.slider-button.right {
+    right: 10px; /* Position on the right */
+    top: 50%; /* Center vertically */
+    transform: translateY(-50%); /* Adjust for perfect centering */
+}
+
+/* Responsiveness for mobile */
+@media (max-width: 768px) {
+    .slide {
+        flex: 0 0 calc(14.33% - 10px); /* Show 3 items on medium screens */
+    }
+
+    .category-image {
+        width: 60px; /* Adjust image size for medium screens */
+        height: 60px;
+    }
+
+    .slider-button {
+        min-width: 30px; /* Smaller button size */
+        min-height: 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .slide {
+        flex: 0 0 calc(50% - 10px); /* Show 2 items on smaller screens */
+    }
+
+    .category-image {
+        width: 50px; /* Adjust image size for small screens */
+        height: 50px;
+    }
+
+    .slider-button {
+        min-width: 25px; /* Smaller button size */
+        min-height: 25px;
+    }
+}

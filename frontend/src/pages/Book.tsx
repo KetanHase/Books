@@ -75,7 +75,7 @@ const Book: React.FC = () => {
       <BookList userId={user?.id ?? 0} addToCart={addToCart} />
 
       {/* Book Details */}
-       
+         
 
       {/* Footer Section */}
       <Footer />
